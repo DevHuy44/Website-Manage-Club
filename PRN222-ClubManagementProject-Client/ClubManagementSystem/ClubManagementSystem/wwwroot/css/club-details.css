@@ -1,0 +1,48 @@
+﻿.avatar-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the space between avatars */
+}
+
+.avatar {
+    width: 50px; /* Adjust the size of the avatars */
+    height: 50px;
+    border-radius: 50%; /* Makes the avatars rounded */
+    overflow: hidden; /* Ensures the image stays within the rounded border */
+    border: 2px solid #fff; /* Optional: Adds a border around the avatars */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow for better visibility */
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the avatar area */
+}
+.username {
+    position: absolute;
+    transform: translate(-50%, -75%);
+    background-color: rgba(0, 0, 0, 1);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.avatar:hover .username {
+    opacity: 1;
+    visibility: visible;
+}
+#post-input {
+    width: 80%;
+    background-color: rgba(220, 220, 220, 0.222);
+    resize: none;
+    line-height: 2;
+}
+
+#post-image-index {
+    width: 300px !important;
+    height: 225px;
+}

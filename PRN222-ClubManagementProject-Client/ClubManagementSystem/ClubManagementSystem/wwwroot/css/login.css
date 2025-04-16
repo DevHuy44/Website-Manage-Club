@@ -1,0 +1,226 @@
+﻿/*Login style */
+
+.Limiter {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.ContainerLogin {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.WrapLogin {
+    width: 500px;
+    height: 750px;
+    background: #f1e3db;
+    border-radius: 10px;
+    overflow: hidden;
+    padding-right: 55px;
+    padding-left: 55px;
+    padding-bottom: 54px;
+    padding-top: 65px;
+    box-sizing: border-box;
+}
+
+.LoginForm {
+    width: 100%;
+}
+
+.LoginTitle {
+    display: block;
+    font-family: Poppins-Bold;
+    font-size: 39px;
+    color: #333333;
+    line-height: 1.2;
+    text-align: center;
+    padding-bottom: 49px;
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+.InputUsername {
+    position: relative;
+    width: 100%;
+    border-bottom: 2px solid #d9d9d9;
+    margin-bottom: 23px;
+}
+
+.LoginLabel {
+    font-family: Poppins-Regular;
+    font-size: 14px;
+    color: #333333;
+    line-height: 1.5;
+    padding-left: 7px;
+}
+
+.LoginInput {
+    font-family: Poppins-Medium;
+    font-size: 16px;
+    color: #333333;
+    line-height: 1.2;
+    display: block;
+    width: 100%;
+    height: 55px;
+    padding: 0 7px 0 43px;
+    outline: none;
+    border: none;
+}
+
+.InputPassword {
+    position: relative;
+    width: 100%;
+    border-bottom: 2px solid #d9d9d9;
+}
+
+.ForgotPassword {
+    padding-bottom: 31px;
+    padding-top: 8px;
+    text-align: right
+}
+
+.LoginButtonContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.LoginButtonWrap {
+    width: 100%;
+    display: block;
+    position: relative;
+    z-index: 1;
+    border-radius: 25px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.LoginBtnForm {
+    position: absolute;
+    z-index: -1;
+    width: 300%;
+    height: 100%;
+    top: 0;
+    left: -100%;
+    background: -webkit-linear-gradient(right, #00dbde, #fc00ff, #00dbde, #fc00ff);
+    transition: all 0.4s;
+}
+
+.LoginBtn {
+    font-family: Poppins-Medium;
+    font-size: 16px;
+    color: #fff;
+    line-height: 1.2;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    width: 100%;
+    height: 50px;
+    outline: none !important;
+    border: none;
+    background: transparent;
+}
+
+.LoginIcon {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+    .LoginIcon::after {
+        content: attr(data-symbol);
+        font-family: Material-Design-Iconic-Font;
+        color: #adadad;
+        font-size: 22px;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        height: calc(100% - 20px);
+        bottom: 0;
+        left: 0;
+        padding-left: 13px;
+        padding-top: 3px;
+    }
+
+    .LoginIcon::before {
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #7f7f7f;
+        -webkit-transition: all 0.4s;
+        -o-transition: all 0.4s;
+        -moz-transition: all 0.4s;
+        transition: all 0.4s;
+    }
+
+.GoogleLogintextContainer {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #666666;
+    text-align: center !important;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.GoogleLoginContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.GoogleLoginWrap {
+    width: 100%;
+    display: block;
+    position: relative;
+    z-index: 1;
+    border-radius: 25px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.google-login {
+    width: 103%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    color: rgb(12, 12, 12);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.google-login:hover {
+    background-color: #fff;
+} 
+.google-logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.ToSignUp {
+    padding-top: 80px;
+    text-align: center;
+}

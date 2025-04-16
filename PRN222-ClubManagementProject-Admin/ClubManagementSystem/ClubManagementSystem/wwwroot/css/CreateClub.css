@@ -1,0 +1,15 @@
+﻿.LogoPicture {
+    margin-top: 10px;
+}
+
+.CoverPicture {
+    margin-top: 10px;
+}
+
+
+.LogoPicturebtn {
+    padding: 10px 30px;
+    text-transform: uppercase;
+    color: #fff;
+    transition: 350ms;
+}

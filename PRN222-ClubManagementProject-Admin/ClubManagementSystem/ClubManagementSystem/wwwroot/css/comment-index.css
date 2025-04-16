@@ -1,0 +1,29 @@
+﻿/* Custom scrollbar for comments */
+.comment-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.comment-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.comment-area::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+    .comment-area::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* Keep header fixed while scrolling */
+.comment-area .sticky-top {
+    z-index: 1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Comments container spacing */
+.comments-container {
+    padding-right: 5px; /* Prevents scrollbar from overlapping content */
+}

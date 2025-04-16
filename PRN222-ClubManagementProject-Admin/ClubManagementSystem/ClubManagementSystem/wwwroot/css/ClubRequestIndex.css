@@ -1,0 +1,52 @@
+﻿.ClubRequestIndex{
+    margin-bottom : 80px;
+}
+
+/* Đổi màu header bảng */
+.custom-header {
+    background-color: #ce8460 !important;
+}
+
+/* Bo góc bảng */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Hiệu ứng hover */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa !important;
+    transition: 0.3s;
+}
+
+/* Khoảng cách giữa các hàng */
+.table th, .table td {
+    padding: 12px;
+    vertical-align: middle;
+}
+
+/* Hiệu ứng nút */
+.btn {
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+}
+
+    .btn:hover {
+        transform: scale(1.05);
+    }
+
+/* Badge màu sắc */
+.badge {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 0.9rem;
+    }
+}
+
