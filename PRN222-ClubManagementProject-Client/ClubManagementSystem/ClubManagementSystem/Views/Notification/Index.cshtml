@@ -1,0 +1,136 @@
+﻿@model IEnumerable<BussinessObjects.Models.Notification>
+@{
+    ViewData["Title"] = "Notification";
+}
+
+<section class="container mt-4">
+    <div id="header" class="border-bottom border-secondary border-2 py-3 d-flex align-items-center">
+        <a href="#" class="me-3 text-dark">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147
+                2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5" />
+            </svg>
+        </a>
+        <h2 class="m-0">Notifications</h2>
+    </div>
+
+    <div id="body" class="mt-4">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="#" onclick="refreshAllNotifications()" class="btn btn-dark btn-lg rounded-pill shadow-sm">Mark All As Read</a>
+        </div>
+
+        <div class="border rounded shadow-sm p-3 bg-white">
+            <div id="gridHeader" class="row bg-light text-dark py-2 rounded">
+                <div class="col-1"></div>
+                <div class="col-3 text-center"><strong>Created Time</strong></div>
+                <div class="col-3"><strong>Location</strong></div>
+                <div class="col-5"><strong>Message</strong></div>
+            </div>
+            <div id="gridBody">
+                @foreach (var item in Model)
+                {
+                    <div id="gridRow-@item.NotificationId" class="row py-3 border-bottom notification-item @(item.IsRead.Value ? "read-notification" : "unread-notification")">
+                        <div class="col-1 d-flex align-items-center justify-content-center">
+                            <input type="checkbox" class="form-check-input" onchange="refreshNotification(@item.NotificationId)"
+                                   value="@item.IsRead"
+                            @(item.IsRead.Value ? "checked disabled" : "")>
+                        </div>
+                        <div class="col-3 text-center d-flex align-items-center"><span>@item.CreatedAt</span></div>
+                        <div class="col-3 d-flex align-items-center"><span>@item.Location</span></div>
+                        <div class="col-5 d-flex align-items-center"><span>@item.Message</span></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@*this is script for ajax refresh when clicked a checkbox to show*@
+<script>
+    function refreshNotification(rowID) {
+        var notiDiv = document.getElementById(`gridRow-${rowID}`)
+        notiDiv.remove();
+        console.log('@Url.Action("UpdateAsync", "Notification")');
+        $.ajax({
+            url: '@Url.Action("UpdateAsync", "Notification")',
+            type: 'POST',
+            data: { NotiID: rowID },
+            success: function (noti) {
+                console.log(noti);
+                var newNoti = `<div id="gridRow-${noti.notificationId}" class="row py-3 border-bottom notification-item read-notification"">
+                        <div class="col-1 d-flex align-items-center justify-content-center">
+                            <input type="checkbox" class="form-check-input" value="${noti.isRead}" checked disabled>
+                        </div>
+                        <div class="col-3 text-center d-flex align-items-center"><span>${noti.createdAt}</span></div>
+                        <div class="col-3 d-flex align-items-center"><span>${noti.location}</span></div>
+                        <div class="col-5 d-flex align-items-center"><span>${noti.message}</span></div>
+                    </div>`;
+                document.getElementById("gridBody").insertAdjacentHTML('beforeend', newNoti);
+            }
+        });
+    }
+
+    function refreshAllNotifications() {
+        var notiBody = document.getElementById("gridBody")
+        notiBody.innerHTML = "";
+        $.ajax({
+            url: '@Url.Action("UpdateAllAsync", "Notification")',
+            type: 'POST',
+            success: function (data) {
+                data.forEach(function(noti) {
+                // Build the new notification's HTML string
+                var newNoti = `<div id="gridRow-${noti.notificationId}" class="row py-3 border-bottom notification-item read-notification"">
+                        <div class="col-1 d-flex align-items-center justify-content-center">
+                            <input type="checkbox" class="form-check-input" value="${noti.isRead}" checked disabled>
+                        </div>
+                        <div class="col-3 text-center d-flex align-items-center"><span>${noti.createdAt}</span></div>
+                        <div class="col-3 d-flex align-items-center"><span>${noti.location}</span></div>
+                        <div class="col-5 d-flex align-items-center"><span>${noti.message}</span></div>
+                    </div>`;
+                document.getElementById("gridBody").insertAdjacentHTML('beforeend', newNoti);
+            });
+            }
+        });
+    }
+</script>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .notification-item {
+        transition: background 0.3s ease-in-out;
+        border-radius: 8px;
+    }
+
+    .unread-notification {
+        background-color: #fff3cd;
+        font-weight: bold;
+    }
+
+    .read-notification {
+        background-color: #f8f9fa;
+        opacity: 0.8;
+    }
+
+    .bg-light {
+        background-color: #e9ecef !important;
+    }
+
+    .btn-dark {
+        background-color: #343a40;
+        color: white;
+        transition: background 0.3s;
+    }
+
+    .btn-dark:hover {
+        background-color: #23272b;
+    }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+</style>
