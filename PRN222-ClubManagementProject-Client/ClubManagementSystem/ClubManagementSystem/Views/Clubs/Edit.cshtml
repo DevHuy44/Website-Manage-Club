@@ -1,0 +1,228 @@
+﻿@model BussinessObjects.Models.Dtos.ClubEditViewDto
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+	ViewData["Title"] = "Edit";
+	string? sessionPicture = HttpContextAccessor.HttpContext.Session.GetString("userPicture") as string;
+}
+<div class="container mt-4">
+	<div class="row">
+		<!-- Edit Club Form -->
+		<div class="col-md-6">
+			<div class="card shadow p-4">
+				<h4 class="text-center mb-4">Edit Club</h4>
+				<form asp-action="Edit" method="post">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<input type="hidden" asp-for="ClubId" />
+					<div class="form-group mb-3">
+						<label asp-for="ClubName" class="form-label"></label>
+						<input asp-for="ClubName" class="form-control" />
+						<span asp-validation-for="ClubName" class="text-danger"></span>
+					</div>
+					<div class="form-group mb-3">
+						<label asp-for="Description" class="form-label"></label>
+						<textarea asp-for="Description" class="form-control"></textarea>
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary">Save</button>
+					</div>
+				</form>
+
+			</div>
+			<div class="d-flex gap-2 mt-3">
+				<a asp-action="Index" asp-controller="JoinRequests" asp-route-id="@Model.ClubId" asp-route-clubId="@Model.ClubId"
+				   class="btn btn-primary btn-lg fw-bold px-4 d-flex align-items-center">
+					<i class="bi bi-person-plus me-2"></i> Join Requests
+				</a>
+				<a asp-action="Index" asp-controller="ClubMembers" asp-route-id="@Model.ClubId"
+				   class="btn btn-success btn-lg fw-bold px-4 d-flex align-items-center">
+					<i class="bi bi-people me-2"></i> Club Members
+				</a>
+				<a data-bs-toggle="modal" data-bs-target="#DeleteClubModal" onclick="setClubId('@Model.ClubId')"
+				   class="btn btn-danger btn-lg fw-bold px-4 d-flex align-items-center">
+					<i class="bi bi-trash me-2"></i> Delete Club
+				</a>
+			</div>
+
+
+
+		</div>
+
+		<!-- Delete club Modal -->
+		<div class="modal fade" id="DeleteClubModal" tabindex="-1" aria-labelledby="DeleteClubModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header bg-danger text-white">
+						<h5 class="modal-title" id="DeleteClubModalLabel">Delete club</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<form id="deleteClubForm" method="post" asp-action="DeleteClub" asp-route-id="@Model.ClubId">
+						<div class="modal-body">						
+							<input type="hidden" id="deleteClubIdInput" name="id" asp-for="ClubId">
+							<p>Are you sure to delete this club?</p>
+							<div class="alert alert-warning">
+								<i class="bi bi-exclamation-triangle-fill"></i> This action cannot be undone!
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+							<button type="submit" class="btn btn-danger">Confirm Delete</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Upload Images Section -->
+		<div class="col-md-6">
+			<!--Logo Picture-->
+			<div class="card shadow p-4 text-center">
+				<h5>Logo Picture</h5>
+				<div class="d-flex justify-content-center">
+					<img src="@Model.Logo"
+						 id="LogoPictureId"
+						 alt="Profile Picture" class="img-thumbnail rounded-circle"
+						 style="width: 150px; height: 150px; object-fit: cover;">
+				</div>
+				<div class="small text-muted mb-3">JPG, JPEG, PNG - max 5MB</div>
+				<form asp-action="UploadLogoPicture" method="post" enctype="multipart/form-data" asp-route-id="@Model.ClubId">
+					<input type="hidden" name="id" value="@Model.ClubId" />
+					<input type="file" name="logoPicture" class="form-control d-none" id="fileLogoImage"
+						   onchange="fileLogoSelected(), previewLogoImage()" accept=".jpg, .jpeg, .png">
+					<button type="button" class="btn btn-primary mt-2" onclick="document.getElementById('fileLogoImage').click()">Upload New</button>
+					<div class="mt-2">
+						<button type="submit" class="btn btn-primary d-none" id="submitLogoButton">Confirm</button>
+					</div>
+				</form>
+			</div>
+
+			<!--Cover Picture-->
+			<div class="card shadow p-4 text-center mt-4">
+				<h5>Cover Picture</h5>
+				<div class="d-flex justify-content-center">
+					<img src="@Model.Cover"
+						 id="CoverPictureId"
+						 alt="Cover Picture" class="img-thumbnail rounded mb-3"
+						 style="width: 100%; max-width: 400px; height: auto; object-fit: cover;">
+				</div>
+				<div class="small text-muted mb-3">JPG, JPEG, PNG - max 5MB</div>
+				<form asp-action="UploadCoverPicture" method="post" enctype="multipart/form-data" asp-route-id="@Model.ClubId">
+					<input type="hidden" name="clubId" value="@Model.ClubId" />
+					<input type="file" name="coverPicture" class="form-control d-none" id="fileCoverImage"
+						   onchange="fileCoverSelected(), previewCoverImage()" accept=".jpg, .jpeg, .png">
+					<button type="button" class="btn btn-primary mt-2" onclick="document.getElementById('fileCoverImage').click()">Upload New</button>
+					<div class="mt-2">
+						<button type="submit" class="btn btn-primary d-none" id="submitCoverButton">Confirm</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	 // Show the submit button when a file is selected
+	function fileLogoSelected() {
+		const fileInput = document.getElementById('fileLogoImage');
+		const submitButton = document.getElementById('submitLogoButton');
+
+		// Only show the submit button if a file has been selected
+		if (fileInput.files.length > 0) {
+			submitButton.style.display = 'inline-block'; // Show submit button
+		}
+	}
+
+	 // Preview the selected logo image
+	function previewLogoImage() {
+		const fileInput = document.getElementById('fileLogoImage');
+		const Logopicture = document.getElementById('LogoPictureId');
+		// Check if a file is selected
+		if (fileInput.files && fileInput.files[0]) {
+			const reader = new FileReader();
+
+			reader.onload = function (e) {
+				// Update the profile picture preview
+				Logopicture.src = e.target.result;
+			};
+
+			// Read the file as a data URL (base64)
+			reader.readAsDataURL(fileInput.files[0]);
+
+			// Show the submit button
+			const submitButton = document.getElementById('submitLogoButton');
+			submitButton.classList.remove('d-none');
+			submitButton.style.display = 'inline-block'; // Show submit button
+		}
+	}
+
+		 // Show the submit button when a file is selected
+	function fileCoverSelected() {
+		const fileInput = document.getElementById('fileCoverImage');
+		const submitButton = document.getElementById('submitCoverButton');
+
+		// Only show the submit button if a file has been selected
+		if (fileInput.files.length > 0) {
+			submitButton.style.display = 'inline-block '; // Show submit button
+		}
+	}
+
+	 // Preview the selected image
+	function previewCoverImage() {
+		const fileInput = document.getElementById('fileCoverImage');
+		const Coverpicture = document.getElementById('CoverPictureId');
+		// Check if a file is selected
+		if (fileInput.files && fileInput.files[0]) {
+			const reader = new FileReader();
+
+			reader.onload = function (e) {
+				// Update the profile picture preview
+				Coverpicture.src = e.target.result;
+			};
+
+			// Read the file as a data URL (base64)
+			reader.readAsDataURL(fileInput.files[0]);
+
+			// Show the submit button
+			const submitButton = document.getElementById('submitCoverButton');
+			submitButton.classList.remove('d-none');
+			submitButton.style.display = 'inline-block'; // Show submit button
+		}
+	}
+</script>
+
+<script>
+	function setClubId(ClubId) {
+		document.getElementById('deleteClubIdInput').value = ClubId;
+		
+	}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var successMessage = '@TempData["SuccessMessage"]';
+		if (successMessage) {
+			Swal.fire({
+				title: "Success!",
+				text: successMessage,
+				icon: "success",
+				confirmButtonText: "OK"
+			});
+		}
+		var errorMessage = '@TempData["ErrorMessage"]';
+		if (errorMessage) {
+			Swal.fire({
+				title: "Error!",
+				text: errorMessage,
+				icon: "error",
+				confirmButtonText: "OK"
+			});
+		}
+	});
+</script>
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
