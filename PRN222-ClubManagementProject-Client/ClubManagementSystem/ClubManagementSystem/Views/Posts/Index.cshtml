@@ -1,0 +1,71 @@
+@model BussinessObjects.Models.Dtos.ClubDetailsViewDto
+@{
+	var totalPages = Math.Ceiling((double)Model.TotalPosts / Model.PostSize);
+}
+<!-- Post -->
+@if (ViewBag.IsMember){
+	@await Html.PartialAsync("~/Views/Posts/Create.cshtml", Model)
+}
+@foreach (var post in Model.Posts)
+{
+	<div class="mb-4 post-list border-bottom pb-4">
+		<div class="row no-gutters">
+			<div class="col-md-5">
+				<a class="post-thumb" asp-action="Details" asp-controller="Posts" asp-route-id="@post.PostId">
+					<img src="@(string.IsNullOrEmpty(post.ImageBase64) ? Url.Content("~/defaultImage.jpg") : post.ImageBase64)"
+					id="post-image-index" 
+					class="img-fluid">
+				</a>
+
+			</div>
+
+			<div class="col-md-7">
+				<div class="post-article mt-sm-3">
+					<div class="meta-cat">
+						<a asp-action="Details" asp-controller="Posts" asp-route-id="@post.PostId">
+							<span class="letter-spacing cat-name font-extra text-uppercase font-sm">Post</span>
+						</a>
+					</div>
+
+					<h3 class="mt-2">
+						<a asp-action="Details" asp-controller="Posts" asp-route-id="@post.PostId">@post.Title</a>
+					</h3>
+
+					<div class="post-meta">
+						<ul class="list-inline">
+							<li class="post-like list-inline-item">
+								<span class="font-sm letter-spacing-1 text-uppercase">
+									<i class="ti-time mr-2"></i> @post.CreatedAt
+								</span>
+							</li>
+							<li class="post-view list-inline-item letter-spacing-1">@post.User.Username</li>
+						</ul>
+					</div>
+
+					<div class="post-content">
+						<p>
+							<a asp-action="Details" asp-controller="Posts" asp-route-id="@post.PostId">
+								@(post.Content.Length > 50 ? post.Content[..50] + "..." : post.Content)
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+}
+
+<div class="pagination mt-5 pt-4">
+	<ul class="list-inline">
+
+		@for (var i = 1; i <= totalPages; i++)
+		{
+			<li class="list-inline-item">
+				<a asp-action="Details" asp-route-id="@Model.ClubId" asp-route-pageNumber="@i"
+				   asp-route-pageSize="@Model.PostSize" class="@(Model.PostNumber == i ? "active" : "")">@i</a>
+			</li>
+		}
+
+	</ul>
+</div>
