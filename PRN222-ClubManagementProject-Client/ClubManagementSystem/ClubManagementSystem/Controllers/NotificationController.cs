@@ -38,7 +38,7 @@ namespace ClubManagementSystem.Controllers
             await _NS.UpdateNotificationAsync(notification);
             return Json(notification);
         }
-
+/*
         [HttpPost("UpdateAllAsync")]
         public async Task<JsonResult> UpdateAllAsync()
         {
@@ -46,6 +46,6 @@ namespace ClubManagementSystem.Controllers
             await _NS.UpdateAllNotificationsAsync(Int32.Parse(UserID));
             var notifications = await _NS.GetNotificationsAsync(Int32.Parse(UserID));
             return Json(notifications);
-        }
+        }*/
     }
 }
