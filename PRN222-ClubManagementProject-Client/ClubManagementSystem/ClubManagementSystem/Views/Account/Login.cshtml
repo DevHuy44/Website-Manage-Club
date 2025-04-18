@@ -1,0 +1,80 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+	ViewData["Title"] = "Login";
+}
+<link rel="stylesheet" href="~/css/login.css">
+<section>
+    <div class="Limiter">
+        <div class="ContainerLogin">
+            <div class="WrapLogin">
+                <form asp-controller="Account" asp-action="CheckLogin" class="LoginForm">
+                    <span class="LoginTitle">Login</span>                   
+                    <div class="InputUsername">
+                        <label for="Gmail" class="LoginLabel">Gmail</label>
+                        <input id="Gmail" class="LoginInput" type="text" name="Gmail"
+                               placeholder="Type your Gmail" required>
+                        <span class="LoginIcon" data-symbol="&#xf206;"></span>
+                    </div>
+
+                    <div class="InputPassword">
+                        <label for="Password" class="LoginLabel">Password</label>
+                        <input id="Password" class="LoginInput" type="password" name="Password"
+                               placeholder="Type your username" required>
+                        <span class="LoginIcon" data-symbol="&#xf190;"></span>
+                    </div>
+                    
+                    <div class="ForgotPassword">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="text-danger">
+                                @TempData["ErrorMessage"]
+                            </div>
+                        }
+                    </div>
+
+                    <div class="LoginButtonContainer">
+                        <div class="LoginButtonWrap">
+                            <div class="LoginBtnForm"></div>
+                            <button class="LoginBtn">Login</button>
+                        </div>
+                    </div>                                     
+                </form>              
+                <div class="GoogleLogintextContainer">
+                    <span>Or sign in with</span>
+                </div>
+                <div class="GoogleLoginContainer">
+                    <div class="GoogleLoginWrap">
+                        <a asp-controller="Account" asp-action="GoogleLogin">
+                            <button class="btn google-login">
+                                <img src="https://developers.google.com/identity/images/g-logo.png"
+                                     alt="Google Logo" class="google-logo">
+                                Login with Google
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ToSignUp">
+                    <span>You don't have account?</span> <a asp-action="SignUp" asp-controller="Account">Sign Up</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Swal.fire({
+                title: "Success!",
+                text: successMessage,
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+</script>

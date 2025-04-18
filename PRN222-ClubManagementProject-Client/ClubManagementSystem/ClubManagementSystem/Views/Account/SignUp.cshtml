@@ -1,0 +1,77 @@
+﻿@model BussinessObjects.Models.Dtos.SignUpUserDto
+@{
+    ViewData["Title"] = "Sign Up";
+}
+<link rel="stylesheet" href="~/css/signup.css">
+
+
+<section>
+    <div class="Limiter">
+        <div class="ContainerSignup">
+            <div class="WrapSignup">
+              
+                <form asp-controller="Account" asp-action="SignUp" class="SignupForm">
+                    <span class="SignupTitle">Sign Up</span>
+
+                    <div class="InputUsername">
+                        <label asp-for="Username" class="SignupLabel"></label>
+                        <input asp-for="Username" class="SignupInput" placeholder="Type your username">
+                        <span class="SignupIcon" data-symbol="&#xf206;"></span>
+                        <span asp-validation-for="Username" class="text-danger text-validation"></span>
+
+                    </div>
+
+
+
+                    <div class="InputEmail">
+                        <label for="Email" class="SignupLabel">Email</label>
+                        <input id="Email" class="SignupInput" type="text" name="Email"
+                               placeholder="Type your email">
+                        <span class="SignupIcon" data-symbol="&#xf206;"></span>
+                        <span asp-validation-for="Email" class="text-danger text-validation"></span>
+
+                    </div>
+
+
+                    <div class="InputPassword">
+                        <label for="Password" class="SignupLabel">Password</label>
+                        <input id="Password" class="SignupInput" type="password" name="Password"
+                               placeholder="Type your password">
+                        <span class="SignupIcon" data-symbol="&#xf190;"></span>
+                        <span asp-validation-for="Password" class="text-danger text-validation"></span>
+
+                    </div>
+
+
+                    <div class="InputPassword ConfirmPassword">
+                        <label for="ConfirmPassword" class="SignupLabel">Confirm Password</label>
+                        <input id="PasswordConfirm" class="SignupInput" type="password" name="ConfirmPassword"
+                               placeholder="Type your password">
+                        <span class="SignupIcon" data-symbol="&#xf190;"></span>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger text-validation"></span>
+
+                    </div>
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="text-danger mb-2">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+                    <div class="SignupButtonContainer">
+                        <div class="SignupButtonWrap">
+                            <div class="SignupBtnForm"></div>
+                            <button class="SignupBtn">Sign Up</button>
+                        </div>
+                    </div>
+                </form>
+               
+
+                <div class="ToLogin">
+                    <span>Already have account?</span> <a href="#">Login</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

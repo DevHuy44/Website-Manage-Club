@@ -1,0 +1,225 @@
+﻿@model BussinessObjects.Models.Dtos.EditUserDto
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Edit Profile";
+    string? sessionPicture = HttpContextAccessor.HttpContext.Session.GetString("userPicture") as string;
+}
+
+<link rel="stylesheet" href="~/css/edit-profile.css">
+
+<section class="pt-5 padding-bottom">
+    <div class="edit-profilecontainer">
+        <div style="margin-top: 2%; margin-right: 17%;">
+            <hr class="mt-0 mb-4">
+            <div class="row custom-margin-row">
+                <div class="col-xl-4">
+                    <!-- Profile Picture Card -->
+                    <div class="card mb-4 mb-xl-0">
+                        <div class="card-header">Profile Picture</div>
+                        <div class="card-body text-center">
+                            <!-- Profile picture display -->
+
+                            @if (!string.IsNullOrEmpty(sessionPicture))
+                            {
+                                <img src="@sessionPicture" alt="Profile Picture" id="profilePictureId" class="img-account-profile rounded-circle mb-2">
+                            }
+                            else
+                            {
+                                <img src="~/defaultPicture.jpg" alt="Default Profile Picture" id="profilePictureId" class="img-account-profile rounded-circle mb-2">
+                            }
+
+
+
+                            <div class="small font-italic text-muted mb-4">JPG, JPEG or PNG, max 5MB</div>
+
+                            <!-- Profile picture upload -->
+                            <form asp-action="UploadProfilePicture" method="post" enctype="multipart/form-data">
+                                <!-- Upload New Image Button -->
+                                <div>
+                                    <button class="btn btn-primary" type="button" id="uploadButton">
+                                        <label class="fileImage">
+                                            <input type="file" name="profilePicture" class="form-control-file mb-2" id="fileImage"
+                                                   onchange="fileSelected(), previewImage()" accept=".jpg, .jpeg, .png" />
+                                            Upload New Image
+                                        </label>
+                                    </button>
+                                </div>
+
+                                <!-- Submit Button (Initially Hidden) -->
+                                <div class="mt-3">
+                                    <input type="submit" value="Confirm" class="btn btn-primary" id="submitButton" style="display:none;" />
+                                </div>
+                               
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-8">
+                    <!-- Account Details Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">@Model.Username's Details</div>
+                        <div class="card-body">
+                            <form asp-action="Edit" method="post">
+                                @* <input type="hidden" asp-for="UserId" /> *@
+
+                                @if (TempData["SuccessMessage"] != null)
+                                {
+                                    <div class="text-success mb-2">
+                                        @TempData["SuccessMessage"]
+                                    </div>
+                                }
+                                @if (TempData["ErrorMessage"] != null)
+                                {
+                                    <div class="text-danger mb-2">
+                                        @TempData["ErrorMessage"]
+                                    </div>
+                                }
+
+                                <div class="mb-3">
+                                    <label class="small mb-1">Username</label>
+                                    <input asp-for="Username" class="form-control" readonly id="UsernameField" />
+                                    <span asp-validation-for="Username" class="text-danger"></span>
+                                    <div>
+                                        <button class="btn btn-secondary mt-3" type="button"
+                                                id="UsernameEditButton" onclick="toggleEditableField('Username')">
+                                            Edit
+                                        </button>
+                                    </div>
+                                  
+                                </div>
+
+                                <!-- Password -->
+                                <div class="mb-3">
+                                    <label class="small mb-1">Current Password</label>
+                                    <div class="input-group">
+                                        <input asp-for="CurrentPassword" class="form-control" id="CurrentPasswordField" readonly />
+                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">👁️</button>
+                                    </div>
+                                </div>
+                                <div class="mb-3" id="passwordFields" style="display:none;">
+                                    <div>
+                                        <label class="small mb-1">New Password</label>
+                                        <input asp-for="NewPassword" class="form-control" type="password" placeholder="Enter new password" id="PasswordField" />
+                                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                                    </div>
+                                  
+                                    <div>
+                                        <label class="small mb-1">Confirm Password</label>
+                                        <input asp-for="ConfirmNewPassword" class="form-control" type="password" placeholder="Confirm new password" id="ConfirmPasswordField" />
+                                        <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                                    </div>
+                                   
+                                </div>
+
+                                <!-- Edit Password Button -->
+                                <div class="mb-3">
+                                    <button class="btn btn-secondary" type="button"
+                                            id="PasswordEditButton" onclick="togglePasswordFields()">
+                                                Edit Password
+                                    </button>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="small mb-1">Email</label>
+                                    <input asp-for="Email" class="form-control" type="email" readonly id="EmailField" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                              
+                                <!-- Save Changes Button -->
+                                <div class="form-group mt-4">
+                                    <input type="submit" value="Save changes" class="btn btn-primary" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+       // Toggle edit mode for a given field
+    function toggleEditableField(fieldName) {
+        const field = document.getElementById(`${fieldName}Field`);
+        const editButton = document.getElementById(`${fieldName}EditButton`);
+
+        if (field && editButton) {
+            const isEditable = field.hasAttribute('readonly');
+
+            // Toggle read-only attribute and button styles
+            field.toggleAttribute('readonly');
+            editButton.classList.toggle('btn-secondary', !isEditable);
+            editButton.classList.toggle('btn-success', isEditable);
+
+            if (!isEditable) {
+                field.focus();
+            }
+        } else {
+            console.error(`Field with id "${fieldName}Field" or button with id "${fieldName}EditButton" not found.`);
+        }
+    }
+
+    // Toggle visibility of password fields
+    function togglePasswordFields() {
+        const passwordFields = document.getElementById('passwordFields');
+        const passwordEditButton = document.getElementById('PasswordEditButton');
+
+        if (passwordFields) {
+            // Toggle the display of password fields
+            const isVisible = passwordFields.style.display === 'block';
+            passwordFields.style.display = isVisible ? 'none' : 'block';
+
+            // Toggle button color based on visibility
+            passwordEditButton.classList.toggle('btn-secondary', isVisible);
+            passwordEditButton.classList.toggle('btn-success', !isVisible); 
+        } else {
+            console.error("Password fields not found.");
+        }
+    }
+
+    // Toggle visibility of password
+    function togglePassword() {
+        const passwordField = document.getElementById('CurrentPasswordField');
+        const type = passwordField.type === "password" ? "text" : "password";
+        passwordField.type = type;
+    }
+
+     // Show the submit button when a file is selected
+    function fileSelected() {
+        const fileInput = document.getElementById('fileImage');
+        const submitButton = document.getElementById('submitButton');
+
+        // Only show the submit button if a file has been selected
+        if (fileInput.files.length > 0) {
+            submitButton.style.display = 'inline-block'; // Show submit button
+        }
+    }
+
+     // Preview the selected image
+    function previewImage() {
+        const fileInput = document.getElementById('fileImage');
+        const profilePicture = document.getElementById('profilePictureId');
+
+        // Check if a file is selected
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                // Update the profile picture preview
+                profilePicture.src = e.target.result;
+            };
+
+            // Read the file as a data URL (base64)
+            reader.readAsDataURL(fileInput.files[0]);
+
+            // Show the submit button
+            const submitButton = document.getElementById('submitButton');
+            submitButton.style.display = 'inline-block'; // Show submit button
+        }
+    }
+
+</script>
+

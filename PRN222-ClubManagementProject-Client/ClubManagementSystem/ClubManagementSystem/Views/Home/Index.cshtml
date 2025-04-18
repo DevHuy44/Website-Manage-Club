@@ -1,0 +1,101 @@
+﻿@model BussinessObjects.Models.Dtos.HomeDto
+@{
+	ViewData["Title"] = "Home Page";
+}
+
+<section class="banner-slider">
+	<div class="slider-container">
+		<div class="banner-slide">
+			<img src="~/img/banner/banner_1.jpg" alt="Banner 1" class="img-fluid w-100">
+
+		</div>
+		<div class="banner-slide">
+			<img src="~/img/banner/banner_2.jpeg" alt="Banner 2" class="img-fluid w-100">
+
+		</div>
+		<div class="banner-slide">
+			<img src="~/img/banner/banner_4.jpg" alt="Banner 3" class="img-fluid w-100">
+		</div>
+	</div>
+</section>
+
+
+	<section>
+	<h2 class="mt-4 mb-4 fw-bold text-header text-center">
+		<i class="ti-calendar"></i> Ongoing Events
+	</h2>
+	<div class="border-bottom mb-4"></div>
+
+		<div class="d-flex gap-3 p-2 justify-content-center overflow-auto" style="white-space: nowrap;">
+			
+			<div class="text-muted p-4 text-center">
+				<i class="fas fa-calendar-times fa-2x mb-2"></i>
+				<p class="fw-bold">No upcoming events at the moment.</p>
+			</div>
+		
+		</div>
+	</section>
+
+	<section class="slider mt-4">
+	<h2 class="mt-5 mb-4 fw-bold text-header text-center">
+		<i class="ti-pencil-alt"></i> Latest Posts
+	</h2>
+	<div class="border-bottom mb-4"></div>
+
+		<div class="container-fluid">
+			<div class="row no-gutters">
+				<div class="col-lg-12 col-sm-12 col-md-12 slider-wrap">
+					
+						<div class="text-muted p-4 text-center">
+							<i class="fas fa-newspaper fa-2x mb-2"></i>
+							<p class="fw-bold">No posts available at the moment.</p>
+						</div>
+					
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="section-padding">
+	<h2 class="mt-4 mb-4 fw-bold text-success text-header text-center">
+		<i class="ti-flag-alt"></i> Newest Clubs
+	</h2>
+	<div class="border-bottom mb-4"></div>
+
+
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="row">
+						
+							<div class="text-muted p-4 text-center">
+								<i class="fas fa-users fa-2x mb-2"></i>
+								<p class="fw-bold">No clubs available at the moment.</p>
+							</div>
+						
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</section>
+
+
+<!-- Popup for successfully message -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var successMessage = '@TempData["SuccessMessage"]';
+		if (successMessage) {
+			Swal.fire({
+				title: "Success!",
+				text: successMessage,
+				icon: "success",
+				confirmButtonText: "OK"
+			});
+		}
+	});
+</script>
+
+
+	
