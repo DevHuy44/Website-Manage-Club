@@ -34,7 +34,7 @@ namespace Repositories.Implementation
                 .ToListAsync();
             return clubMembers;
         }
-        public async Task<User?> CheckEmailExist(string email)
+      /*  public async Task<User?> CheckEmailExist(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == email);
             if (user != null)
@@ -42,7 +42,7 @@ namespace Repositories.Implementation
                 return user;
             }
             return null;
-        }
+        }*/
         public async Task<User> AddGmailUser(User user)
         {
             _context.Users.Add(user);
