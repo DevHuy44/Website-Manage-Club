@@ -1,0 +1,45 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<BussinessObjects.Models.Post>
+@{
+    ViewData["Title"] = "Join Requests";
+}
+
+<section class="mt-4 container">
+    <div class="card p-4 shadow-lg">
+        <h2 class="mb-4 text-center">Post Requests</h2>
+        <div class="table-responsive">
+            <table class="table-hover table text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Title)</th>
+                        <th>@Html.DisplayNameFor(model => model.Content)</th>
+                        <th>@Html.DisplayNameFor(model => model.Image)</th>
+                        <th>@Html.DisplayNameFor(model => model.CreatedBy)</th>
+                        <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
+                        <th>@Html.DisplayNameFor(model => model.Status)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <th>@Html.DisplayFor(model => item.Title)</th>
+                            <th>@Html.DisplayFor(model => item.Content)</th>
+                            <th>@Html.DisplayFor(model => item.Image)</th>
+                            <th>@Html.DisplayFor(model => item.CreatedBy)</th>
+                            <th>@Html.DisplayFor(model => item.CreatedAt)</th>
+                            <th>@Html.DisplayFor(model => item.Status)</th>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.PostId" class="btn btn-success btn-sm">Approve</a>
+                                <a asp-action="Details" asp-route-id="@item.PostId" class="btn btn-danger btn-sm">Reject</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
