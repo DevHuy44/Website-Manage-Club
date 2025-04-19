@@ -16,14 +16,14 @@ namespace Services.Implementation
         private readonly IClubRepository _clubRepository;
         private readonly IAccountService _accountService;
         private readonly IImageHelperService _imageHelperService;
-        private readonly IClubMemberService _clubMemberService;
+        /*private readonly IClubMemberService _clubMemberService;*/
         private readonly IPostService _postService;
         public ClubService(IClubRepository clubRepository, IAccountService accountService, IImageHelperService imageHelperService, IClubMemberService clubMemberService, IPostService postService)
         {
             _clubRepository = clubRepository;
             _accountService = accountService;
             _imageHelperService = imageHelperService;
-            _clubMemberService = clubMemberService;
+           /* _clubMemberService = clubMemberService;*/
             _postService = postService;
         }
 
