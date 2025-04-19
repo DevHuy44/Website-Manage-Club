@@ -1,0 +1,163 @@
+@using BussinessObjects.Models.Dtos
+@model BussinessObjects.Models.Dtos.PostDetailsDto
+
+@{
+    ViewData["Title"] = "Details";
+    var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+}
+<link rel="stylesheet" href="~/css/post-details.css">
+<link rel="stylesheet" href="~/css/comment-index.css">
+
+
+<section class="single-block-wrapper section-padding">
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+                <div class="single-post">
+                    <div class="post-header mb-5 text-center">
+                        <div class="meta-cat">
+                            <a class="post-category font-extra text-color text-uppercase font-sm letter-spacing-1"
+                               href="/Clubs/Details/@Model.Club.ClubId">@Model.Club.ClubName</a>
+
+                        </div>
+                        <h2 class="mt-2">
+                            @Model.Title
+                        </h2>
+
+                        <div class="post-meta">
+                            <span class="text-uppercase font-sm letter-spacing-1 mr-3">by @Model.User.Username</span>
+                            <span class="text-uppercase font-sm letter-spacing-1">@Model.CreatedAt</span>
+                        </div>
+                        
+                        @if (Model.User.UserId == userId)
+                        {
+                            @await Html.PartialAsync("~/Views/Posts/EditDelete.cshtml", Model)
+                        }
+
+
+                        <div class="post-featured-image mt-5">
+                            <img src="@(string.IsNullOrEmpty(Model.ImageBase64) ? Url.Content("~/defaultImage.jpg") : Model.ImageBase64)"
+                            class="img-fluid" 
+                            alt="Post Image"
+                            style="max-height: 500px">
+                        </div>
+                    </div>
+                    <div class="post-body">
+                        <div class="entry-content">
+                            <p>
+                                @Model.Content
+                            </p>
+                        </div>
+
+                        <div class="tags-share-box center-box d-flex justify-content-between align-items-center border-top border-bottom py-3 text-center">
+                            <span class="single-comment-o">
+                                <i class="fa fa-comment-o"></i> @Model.Comments.Count comment
+                            </span>
+
+                            <div class="post-share">
+                                <a href="#" onclick="sharePost(event)">
+                                    Share <i class="ti-share"></i>
+                                </a>
+                            </div>
+
+                            <div class="post-interaction d-flex align-items-center">
+                                <span class="count-number-like me-2" id="like-count-@Model.PostId">
+                                    @Model.LikeCount
+                                </span>
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a class="penci-post-like single-like-button">
+                                        <i class="ti-heart" onclick="toggleLike(@Model.PostId)"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="penci-post-like single-like-button">
+                                        <i class="ti-heart" style="color: red"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                @if (Model.RelatedPosts.Any())
+                {
+                    <div class="related-posts-block mt-5">
+                        <h3 class="news-title mb-4 text-center">You May Also Like</h3>
+                        <div class="row">
+                            @foreach (var post in Model.RelatedPosts)
+                            {
+                                <div class="col-lg-4 col-md-4 col-sm-6">
+                                    <div class="post-block-wrapper mb-4 mb-lg-0">
+                                        <a asp-action="Details" asp-controller="Posts" asp-route-id="@post.PostId">
+                                            <img class="img-fluid" id="related-posts-img" src="@post.ImageBase64"/>
+                                        </a>
+                                        <div class="post-content mt-3">
+                                            <h5>
+                                                <a asp-action="Details" asp-controller="Posts" asp-route-id="@post.PostId">@post.Title</a>
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                <div class="comment-area my-5" style="max-height: 500px; overflow-y: auto;">
+                    <h3 class="mb-4 sticky-top bg-white p-2 text-center">@Model.Comments.Count Comments</h3>
+                    <div class="comments-container" id="CommentOnPost-@Model.PostId">
+                        @foreach (var comment in Model.Comments)
+                        {
+                            @await Html.PartialAsync("~/Views/Comments/Index.cshtml", comment)
+                        }
+                    </div>
+                </div>
+
+                    @{
+                        var commentDto = new CommentDto { PostId = Model.PostId };
+                    }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+
+                        @await Html.PartialAsync("~/Views/Comments/Create.cshtml", commentDto)
+                        @section Scripts {
+                            <partial name="_ValidationScriptsPartial" />
+                        }
+                    }
+            </div>
+
+        </div>
+    </div>
+    </div>
+</section>
+
+
+<script>
+    function toggleLike(postId) {
+        fetch(`/PostReactions/ToggleLike?postId=${postId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById(`like-count-${postId}`).innerText = data.likeCount;
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+     function sharePost(event) {
+        event.preventDefault();
+        const postUrl = window.location.href;
+
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                url: postUrl
+            }).catch((error) => console.log("Error sharing:", error));
+        } else {
+            prompt("Copy this link:", postUrl);
+        }
+    }
+</script>
