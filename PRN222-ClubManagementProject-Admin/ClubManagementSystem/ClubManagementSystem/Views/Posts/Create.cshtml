@@ -1,0 +1,76 @@
+﻿@model BussinessObjects.Models.Dtos.ClubDetailsViewDto
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+	string? sessionPicture = HttpContextAccessor.HttpContext.Session.GetString("userPicture") as string;
+}
+<div class="p-4 mb-5 shadow">
+	<div class="align-items-center d-flex">
+
+		<img src="@(string.IsNullOrEmpty(sessionPicture) ? Url.Content("~/defaultPicture.jpg")  : sessionPicture)" 
+			alt="profile image" 
+			class="w-5 h-5 rounded-circle" 
+			style="width: 100px; height: 100px"/>
+		<!-- Clickable Textarea (Triggers Modal) -->
+		<textarea placeholder="What's on your mind?"
+				  class="px-4 py-2 ms-4 rounded-full border-0 text-lg"
+				  data-bs-toggle="modal"
+				  data-bs-target="#postModal"
+				  id="post-input"
+				  readonly></textarea>
+	</div>
+
+	<!-- Modal for Creating Post -->
+	<div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="postModalLabel">Create a Post</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form asp-action="Create" asp-controller="Posts" id="postForm" method="post" enctype="multipart/form-data">
+					<input type="hidden" name="clubId" value="@Model.ClubId" />
+					<div class="modal-body">
+						<!-- Post Title -->
+						<textarea id="postTitle" name="Title" placeholder="Enter title here"
+								  class="w-100 p-2 rounded border" rows="2" required maxlength="100"></textarea>
+
+						<!-- Post Text -->
+						<textarea id="postContent" name="Content" placeholder="What's on your mind?"
+								  class="w-100 p-2 rounded border" rows="10" required></textarea>
+
+						<!-- Image Upload -->
+						<div class="mt-3">
+							<label for="postImage" class="form-label">Upload Image</label>
+							<input type="file" class="form-control" id="postImage" name="ImageFile" accept=".jpg, .jpeg, .png">
+						</div>
+
+						<!-- Image Preview -->
+						<div id="imagePreview" class="mt-3 d-none text-center">
+							<img id="previewImg" src="#" class="img-fluid rounded" alt="Image Preview">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-primary">Post</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	document.getElementById('postImage').addEventListener('change', function(event) {
+		const file = event.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = function(e) {
+				document.getElementById('previewImg').src = e.target.result;
+				document.getElementById('imagePreview').classList.remove('d-none');
+			};
+			reader.readAsDataURL(file);
+		}
+	});
+</script>
