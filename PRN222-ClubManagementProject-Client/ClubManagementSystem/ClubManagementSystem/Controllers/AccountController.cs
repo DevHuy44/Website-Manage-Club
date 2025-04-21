@@ -326,7 +326,7 @@ namespace ClubManagementSystem.Controllers
             return View();
         }
 
-        /*public bool CheckExistUser(string email, string username)
+        public bool CheckExistUser(string email, string username)
         {
             bool emailExists = _accountService.CheckEmailExist(email).Result != null;
             bool usernameExists = _accountService.CheckUsernameExist(username).Result != null;
@@ -345,7 +345,7 @@ namespace ClubManagementSystem.Controllers
             }
 
             return false;
-        }*/
+        }
 
         public IActionResult AccessDenied()
         {
