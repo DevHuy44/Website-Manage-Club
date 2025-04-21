@@ -30,7 +30,7 @@ namespace ClubManagementSystem.Controllers
             _roleService = roleService;
             _sender = sender;
         }
-
+        //Check check
         // GET: JoinRequests
         //[ServiceFilter(typeof(ClubAuthorization))]
         [ClubAdminAuthorize("Admin")]
