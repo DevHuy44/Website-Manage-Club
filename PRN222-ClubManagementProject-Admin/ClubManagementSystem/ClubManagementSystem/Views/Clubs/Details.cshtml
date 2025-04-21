@@ -1,0 +1,217 @@
+﻿@model BussinessObjects.Models.Dtos.ClubDetailsViewDto
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+	ViewData["Title"] = "Details";
+	var username = User.FindFirst(ClaimTypes.Name)?.Value;
+	
+}
+
+<link rel="stylesheet" href="~/css/club-details.css">
+<section class="banner">
+	<div class="container">
+		<div class="banner-img d-flex justify-content-center">
+				<div>
+					<img src="@(string.IsNullOrEmpty(Model.CoverBase64) ? Url.Content("~/defaultImage.jpg") : Model.CoverBase64)"
+						 alt="Cover picture"
+						 class="img-fluid"
+						 style="width: 1000px; height: 500px">
+				</div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="banner-content text-center">
+					@* <div class="meta-cat"> *@
+					@* 	<span class="text-capitalize letter-spacing-1 cat-name font-extra text-color">Travel</span> *@
+					@* </div> *@
+					<div >
+						<h2>@Model.ClubName</h2>
+					</div>
+
+					@* Statistic here: Member, post, event count*@
+					<div class="post-meta footer-meta">
+						<ul class="list-inline">
+							<li class="post-like list-inline-item">
+								<span class="count">@Model.ClubMembers.Count</span> Members
+							</li>
+							<li class="post-read list-inline-item">@Model.Posts.Count Posts</li>
+						</ul>
+					</div>
+					<div class="post-content">
+			
+						<div class="avatar-list">
+
+							@for (int i = 0; i < Model.ClubMembers.Count && i < 10; i++)
+							{
+								var member = Model.ClubMembers[i];
+								<div class="avatar">
+									<img src="@(member.ProfilePictureBase64)" alt="@member.Username">
+									<span class="username">@member.Username</span>
+								</div>
+							}
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+
+
+<section class="section-padding pt-4">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+				<div class="mb-5">
+					@if (Model.OngoingEvent != null)
+					{
+						<h4 class="mt-4 fw-bold text-primary">Ongoing Event</h4>
+						<div class="card border-primary shadow-lg">
+							<div class="card-header bg-primary text-white d-flex align-items-center">
+								<i class="fas fa-calendar-alt me-2"></i>
+								<span class="fw-bold">Live Now</span>
+							</div>
+							<div class="card-body">
+								<h4 class="card-title text-primary fw-bold">@Model.OngoingEvent.EventTitle</h4>
+								<h6 class="card-subtitle mb-2 text-muted">
+									<i class="far fa-clock"></i>
+									<span id="eventTime">@Model.OngoingEvent.EventDate.ToString("MMM dd, yyyy hh:mm tt")</span>
+								</h6>
+								<p class="card-text">@Model.OngoingEvent.EventDescription</p>
+							</div>
+						</div>
+					}
+
+					@if (Model.IncomingEvents?.Count > 0)
+					{
+						<h4 class="mt-4 fw-bold text-secondary">Incoming Events</h4>
+						<div class="d-flex pb-2 incoming-events overflow-auto">
+							@foreach (var item in Model.IncomingEvents)
+							{
+								<div class="card event-card rounded border-0 shadow-sm">
+									<div class="card-body text-center">
+										<h6 class="card-title text-primary fw-bold">@item.EventTitle</h6>
+										<p class="card-subtitle text-muted small">
+											<i class="far fa-calendar"></i> @item.EventDate.ToString("MMM dd, yyyy hh:mm tt")
+										</p>
+										<p class="card-text small">@item.EventDescription</p>
+										<a href="#" class="btn btn-outline-secondary btn-sm">
+											<i class="fas fa-eye"></i> View Details
+										</a>
+									</div>
+								</div>
+							}
+						</div>
+					}
+
+				</div>
+
+				<div>
+					@await Html.PartialAsync("~/Views/Posts/Index.cshtml", Model)
+				</div>
+				
+			</div>
+			<div class="col-lg-4 col-md-8 col-sm-12 col-xs-12">
+				<div class="sidebar sidebar-right">
+
+					<div class="my-4 d-flex flex-column align-items-center text-center">
+						@if (ViewBag.IsMember){
+							<a asp-controller="Events" asp-action="Index" asp-route-clubID="@Model.ClubId" class="btn btn-primary btn-lg">
+								<i class="fas fa-calendar-alt me-2"></i> View Club Events
+							</a>
+						}else{
+							<a asp-controller="JoinRequests" asp-action="Create" asp-route-clubID="@Model.ClubId" class="btn btn-primary btn-lg">
+								<i class="fas fa-calendar-alt me-2"></i> Join
+							</a>
+						}
+
+						@if (ViewBag.IsMember)
+						{
+
+							string clubRoleClaim = $"ClubRole_{@Model.ClubId}";
+                            bool isClubAdmin = User.Claims.Any(c => c.Type == clubRoleClaim && c.Value == "Admin");
+							bool isModerator = User.Claims.Any(c => c.Type == clubRoleClaim && c.Value == "Moderator");
+							if (isClubAdmin || isModerator || User.IsInRole("SystemAdmin"))
+								{
+									<a asp-controller="Posts" asp-action="ApprovePost" asp-route-id="@Model.ClubId" class="btn btn-primary btn-lg" style="margin-top:20px">
+										<i class="fa-solid fa-check"></i> Approve post
+									</a>
+								}                                   							
+						}
+					</div>
+
+					<div class="sidebar-wrap mt-5 mt-lg-0">
+						<div class="sidebar-widget about mb-5 p-3 text-center">
+							<div class="about-author">
+								<img src="@(string.IsNullOrEmpty(Model.LogoBase64) ? Url.Content("~/defaultPicture.jpg")  : Model.LogoBase64)"
+									 alt="Logo picture"
+									 class="img-fluid">
+
+							</div>
+							<h4 class="mb-0 mt-4">@Model.ClubName</h4>
+							<p>
+								@Model.Description
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.incoming-events {
+		gap: 15px;
+		scrollbar-width: thin;
+		scroll-behavior: smooth;
+		white-space: nowrap;
+		overflow-x: auto;
+		padding-bottom: 5px;
+	}
+
+	.event-card {
+		min-width: 260px;
+		transition: transform 0.2s ease-in-out;
+	}
+
+		.event-card:hover {
+			transform: scale(1.05);
+		}
+</style>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Popup success and fail -->
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var successMessage = '@TempData["SuccessMessage"]';
+		if (successMessage) {
+			Swal.fire({
+				title: "Success!",
+				text: successMessage,
+				icon: "success",
+				confirmButtonText: "OK"
+			});
+		}
+		var errorMessage = '@TempData["ErrorMessage"]';
+		if (errorMessage) {
+			Swal.fire({
+				title: "Error!",
+				text: errorMessage,
+				icon: "error",
+				confirmButtonText: "OK"
+			});
+		}
+	});
+</script>
+
