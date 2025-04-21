@@ -216,21 +216,7 @@ namespace ClubManagementSystem.Controllers
         }
 
 
-        //[Authorize(Roles = "SystemAdmin")]
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var user = await _accountService.FindUserAsync(id.Value);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(user);
-        //}
+       
 
         [Authorize]
         public async Task<IActionResult> Edit()
