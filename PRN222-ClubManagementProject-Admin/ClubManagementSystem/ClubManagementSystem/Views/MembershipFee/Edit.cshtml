@@ -1,0 +1,51 @@
+﻿@model BussinessObjects.Models.Fee
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Phí";
+}
+
+<h2>Chỉnh Sửa Phí: @Model.FeeDescription</h2>
+
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.Any(m => m.Value.Errors.Any()))
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" name="feeId" value="@Model.FeeId" />
+
+    <div class="form-group">
+        <label>Số Tiền (VND)</label>
+        <input name="amount" class="form-control" type="number" step="0.01" value="@Model.Amount" required />
+    </div>
+
+    <div class="form-group">
+        <label>Hạn Đóng Phí</label>
+        <input name="dueDate" class="form-control" type="date" value="@Model.DueDate.ToString("yyyy-MM-dd")" required />
+    </div>
+
+    <div class="form-group">
+        <label>Mô Tả Phí</label>
+        <textarea name="feeDescription" class="form-control" required>@Model.FeeDescription</textarea>
+    </div>
+
+    
+        <div class="form-group">
+            <label>Loại Phí</label>
+            <select name="feeType" class="form-control" asp-items="@ViewBag.FeeTypes" required></select>
+        </div>
+   
+
+    <div class="form-group">
+        <label>Phương Thức Thanh Toán</label>
+        <input name="paymentMethod" class="form-control" value="@Model.PaymentMethod" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
+    <a asp-action="Index" asp-route-clubId="@Model.ClubId" class="btn btn-secondary">Hủy</a>
+</form>

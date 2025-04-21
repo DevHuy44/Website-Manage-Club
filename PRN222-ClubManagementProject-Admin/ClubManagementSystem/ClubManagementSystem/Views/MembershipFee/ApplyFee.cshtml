@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Áp Dụng Phí Cho Tất Cả Thành Viên";
+}
+
+<h2>Áp Dụng Phí Cho Tất Cả Thành Viên</h2>
+
+<form asp-action="ApplyFee" method="post">
+    <input type="hidden" name="clubId" value="@ViewBag.ClubId" />
+
+    <div class="form-group">
+        <label>Chọn Phí</label>
+        <select name="feeId" class="form-control" required>
+            <option value="">-- Chọn phí --</option>
+            @foreach (var fee in ViewBag.Fees)
+            {
+                <option value="@fee.FeeId">@fee.FeeDescription - @fee.Amount VND (Hạn: @fee.DueDate.ToString("dd/MM/yyyy"))</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Áp Dụng</button>
+    <a asp-action="Index" asp-route-clubId="@ViewBag.ClubId" class="btn btn-secondary">Hủy</a>
+</form>
