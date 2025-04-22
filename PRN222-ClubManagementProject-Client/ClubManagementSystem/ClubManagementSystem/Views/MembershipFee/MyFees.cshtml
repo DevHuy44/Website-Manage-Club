@@ -1,0 +1,115 @@
+﻿@model IEnumerable<BussinessObjects.Models.MembershipFee>
+
+@{
+    ViewData["Title"] = "Các Khoản Phí Của Tôi";
+}
+
+<h2>Các Khoản Phí Của Tôi</h2>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">@ViewBag.Message</div>
+}
+else
+{
+    <div id="membershipFeesTable">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Câu Lạc Bộ</th>
+                <th>Mô Tả Phí</th>
+                <th>Loại Phí</th>
+                <th>Số Tiền (VND)</th>
+                <th>Hạn Đóng</th>
+                <th>Phương Thức Thanh Toán</th>
+                <th>Trạng Thái</th>
+                <th>Ngày Thanh Toán</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var membershipFee in Model)
+            {
+                <tr>
+                    <td>@membershipFee.ClubMember.Club.ClubName</td>
+                    <td>@membershipFee.Fee.FeeDescription</td>
+                    <td>@membershipFee.Fee.FeeType</td>
+                    <td>@membershipFee.Fee.Amount</td>
+                    <td>@membershipFee.Fee.DueDate.ToString("dd/MM/yyyy")</td>
+                    <td>@membershipFee.Fee.PaymentMethod</td>
+                    <td>@membershipFee.Status</td>
+                    <td>@(membershipFee.PaidAt.HasValue ? membershipFee.PaidAt.Value.ToString("dd/MM/yyyy") : "Chưa thanh toán")</td>
+                    <td>
+                        @if (membershipFee.Status == "Pending" || membershipFee.Status == "Overdue")
+                        {
+                            <form asp-action="PayFee" method="post" style="display:inline;">
+                                <input type="hidden" name="membershipFeeId" value="@membershipFee.MembershipFeeId" />
+                                <button type="submit" class="btn btn-success btn-sm">Thanh Toán</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Quay Lại</a>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Popup success and fail -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessagePayment"]';
+        if (successMessage) {
+            Swal.fire({
+                title: "Success!",
+                text: successMessage,
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        }
+        var errorMessage = '@TempData["ErrorMessagePayment"]';
+        if (errorMessage) {
+            Swal.fire({
+                title: "Error!",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+</script>
+
+<script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notificationHub")
+        .build();
+
+    connection.on("ReceiveNotification", function (message) {
+       // alert(message); // Hoặc hiển thị trong UI
+        
+        Swal.fire({
+            title: "Warning!",
+            text: message,
+            icon: "warning",
+            confirmButtonText: "OK"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log("Reloading page...");
+                location.reload(); // Tải lại trang sau khi người dùng nhấn OK
+            }
+        });
+        
+    });
+
+    
+    connection.start().catch(function (err) {
+        return console.error(err.toString());
+    });
+</script>

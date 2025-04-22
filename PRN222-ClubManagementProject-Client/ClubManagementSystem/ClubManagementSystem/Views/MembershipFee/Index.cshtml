@@ -1,0 +1,51 @@
+﻿@model IEnumerable<BussinessObjects.Models.Fee>
+
+@{
+    ViewData["Title"] = "Danh Sách Phí Câu Lạc Bộ";
+}
+
+<h2>Danh Sách Phí Câu Lạc Bộ</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a asp-action="CreateFee" asp-route-clubId="@ViewBag.ClubId" class="btn btn-primary">Tạo Phí Mới</a>
+    <a asp-action="ApplyFee" asp-route-clubId="@ViewBag.ClubId" class="btn btn-success">Áp Dụng Phí Cho Tất Cả Thành Viên</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mô Tả Phí</th>
+            <th>Số Tiền (VND)</th>
+            <th>Hạn Đóng</th>
+            <th>Loại Phí</th>
+            <th>Phương Thức Thanh Toán</th>
+            <th>Hành Động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var fee in Model)
+        {
+            <tr>
+                <td>@fee.FeeDescription</td>
+                <td>@fee.Amount</td>
+                <td>@fee.DueDate.ToString("dd/MM/yyyy")</td>
+                <td>@fee.FeeType</td>
+                <td>@fee.PaymentMethod</td>
+                <td>
+                    <a asp-action="Edit" asp-route-feeId="@fee.FeeId" class="btn btn-warning">Chỉnh Sửa</a>
+                    <a asp-action="Details" asp-route-feeId="@fee.FeeId" class="btn btn-info">Xem Thành Viên</a>
+                    <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phí này không?');">
+                        <input type="hidden" name="clubId" value="@fee.ClubId" />
+                        <input type="hidden" name="feeId" value="@fee.FeeId" />
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,56 @@
+﻿@model IEnumerable<BussinessObjects.Models.MembershipFee>
+
+@{
+    ViewData["Title"] = "Chi Tiết Phí";
+    var fee = ViewBag.Fee;
+}
+
+<h2>Chi Tiết Phí: @fee.FeeDescription</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="Remind" method="post">
+    <input type="hidden" name="feeId" value="@fee.FeeId" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chọn</th>
+                <th>Tên Thành Viên</th>
+                <th>Số Tiền (VND)</th>
+                <th>Hạn Đóng</th>
+                <th>Trạng Thái</th>
+                <th>Ngày Thanh Toán</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var membershipFee in Model)
+            {
+                <tr>
+                    <td>
+                        @if (membershipFee.Status == "Pending" || membershipFee.Status == "Overdue")
+                        {
+                            <input type="checkbox" name="memberIds" value="@membershipFee.MemberId" />
+                        }
+                    </td>
+                    <td>@membershipFee.ClubMember.User.Username</td>
+                    <td>@fee.Amount</td>
+                    <td>@fee.DueDate.ToString("dd/MM/yyyy")</td>
+                    <td>@membershipFee.Status</td>
+                    <td>@(membershipFee.PaidAt.HasValue ? membershipFee.PaidAt.Value.ToString("dd/MM/yyyy") : "Chưa thanh toán")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-warning">Gửi Nhắc Nhở</button>
+    <a asp-action="Index" asp-route-clubId="@fee.ClubId" class="btn btn-secondary">Quay Lại</a>
+</form>
