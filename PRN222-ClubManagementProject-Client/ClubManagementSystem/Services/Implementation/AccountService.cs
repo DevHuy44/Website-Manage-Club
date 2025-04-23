@@ -84,7 +84,7 @@ namespace Services.Implementation
             return (true, "Profile updated successfully.");
         }
 
-        public async Task<byte[]> GetDefaultProfilePictureAsync()
+    /*    public async Task<byte[]> GetDefaultProfilePictureAsync()
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "defaultPicture.jpg");
 
@@ -95,7 +95,7 @@ namespace Services.Implementation
 
             return await System.IO.File.ReadAllBytesAsync(filePath);
         }
-
+*/
 
     }
 }
