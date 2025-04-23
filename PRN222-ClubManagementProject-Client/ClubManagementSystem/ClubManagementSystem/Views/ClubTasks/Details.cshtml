@@ -1,0 +1,144 @@
+﻿@model BussinessObjects.Models.ClubTask
+
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<section class="container mt-4">
+    <div class="card shadow-sm rounded">
+        <div class="card-header bg-primary text-white">
+            <h3 class="fw-bold">📋 Task Details</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold">Description:</dt>
+                <dd class="col-sm-9">@Model.TaskDescription</dd>
+
+                <dt class="col-sm-3 fw-bold">Status:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge
+                        @(Model.Status == "On Going" ? "bg-warning text-dark" :
+                        Model.Status == "End" ? "bg-danger" :
+                        Model.Status == "Completed" ? "bg-success" : "bg-secondary") p-2">
+                        @Model.Status
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">Due Date:</dt>
+                <dd class="col-sm-9">@Model.DueDate?.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                <dt class="col-sm-3 fw-bold">Created At:</dt>
+                <dd class="col-sm-9">@Model.CreatedAt?.ToString("yyyy-MM-dd HH:mm")</dd>
+
+                <dt class="col-sm-3 fw-bold">Created By:</dt>
+                <dd class="col-sm-9">@Model.CreatedByNavigation?.User.Username</dd>
+
+                <dt class="col-sm-3 fw-bold">Event:</dt>
+                <dd class="col-sm-9">@Model.Event?.EventTitle</dd>
+            </dl>
+
+            <h5 class="mt-4">👥 Assigned Participants</h5>
+            <div class="table-responsive shadow-sm rounded">
+                <table class="table table-striped align-middle text-center">
+                    <thead class="table-dark text-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.TaskAssignments)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.Membership.User.Username</td>
+                                <td>
+                                    <span class="badge
+                                        @(item.Status == "Pending" ? "bg-warning text-dark" :
+                                        item.Status == "Completed" ? "bg-success" :
+                                        item.Status == "Failed" ? "bg-danger" : "bg-secondary") p-2">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-action="Delete" asp-controller="TaskAssignments" asp-route-id="@item.AssignmentId" class="btn btn-danger d-flex align-items-center">
+                                        <i class="bi bi-trash3 me-1"></i> UnAssigned
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if(Model.Event.Status != "Cancelled" && Model.Event.Status != "Finished"){
+                <h5 class="mt-4">➕ Assign a Member</h5>
+                <div class="d-flex align-items-center gap-2">
+                    <select id="memberSelect" class="form-select">
+                        @foreach (var member in ViewBag.Members)
+                        {
+                            <option value="@member.Value">@member.Text</option>
+                        }
+                    </select>
+                    <button class="btn btn-success" onclick="assignMember('@Model.TaskId','@Model.CreatedByNavigation.ClubId')">
+                        <i class="bi bi-person-plus"></i> Assign
+                    </button>
+                </div>
+            }
+        </div>
+
+        <div class="card-footer d-flex justify-content-between">
+            <button class="btn btn-warning" onclick="showEditModal('@Model?.TaskId','@Model.CreatedByNavigation.ClubId')">
+                <i class="bi bi-pencil-square"></i> Edit
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="editModalContent"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showEditModal(taskId,clubId) {
+            $.get('/ClubTasks/Edit/'+ clubId +'?taskID='+taskId, function (data) {
+                $('#editModalContent').html(data);
+                $('#editModal').modal('show');
+            });
+        }
+
+        function assignMember(taskId,ClubId) {
+            var memberId = $('#memberSelect').val();
+            if (!memberId) {
+                alert("Please select a member.");
+                return;
+            }
+
+            $.post('/TaskAssignments/Assign?id='+ClubId, { taskID: taskId, memberID: memberId})
+                .done(function () {
+                    location.reload(); // Refresh page after assignment
+                })
+                .fail(function () {
+                    alert("Error assigning member.");
+                });
+        }
+
+        function showError() {
+            var errorMessage = "@Html.Raw(ViewBag.Error?.Replace("\"", "\\\""))";
+            if (errorMessage.trim() !== "") {
+                alert(errorMessage);
+            }
+        }
+
+
+        $(document).ready(function () {
+            showError();
+        });
+    </script>
+}
