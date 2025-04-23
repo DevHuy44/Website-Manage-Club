@@ -19,7 +19,7 @@ namespace Services.Interface
         Task<User?> FindUserAsync(int userId);
         Task<User?> UpdateUserAsync(User user);
         Task<(bool Success, string Message)> UpdateUserProfileAsync(int userId, EditUserDto editUser);
-        /*Task<byte[]> GetDefaultProfilePictureAsync();*/
+        Task<byte[]> GetDefaultProfilePictureAsync();
     }
 
 }

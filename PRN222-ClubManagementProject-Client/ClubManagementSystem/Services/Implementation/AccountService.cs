@@ -84,18 +84,18 @@ namespace Services.Implementation
             return (true, "Profile updated successfully.");
         }
 
-    /*    public async Task<byte[]> GetDefaultProfilePictureAsync()
+        public async Task<byte[]> GetDefaultProfilePictureAsync()
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "defaultPicture.jpg");
 
             if (!System.IO.File.Exists(filePath))
             {
-                return Array.Empty<byte>(); 
+                return Array.Empty<byte>();
             }
 
             return await System.IO.File.ReadAllBytesAsync(filePath);
         }
-*/
+
 
     }
 }
