@@ -52,7 +52,7 @@ namespace ClubManagementSystem.Controllers
             return View(postDetails);
         }
 
-
+        //Check if the user is a member of the club
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
