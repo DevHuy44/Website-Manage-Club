@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,8 @@ using Services.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using ClubManagementSystem.Controllers.SignalR;
 using ClubManagementSystem.Controllers.Filter;
-
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 namespace ClubManagementSystem.Controllers
 {
     public class PostsController : Controller
@@ -22,12 +23,17 @@ namespace ClubManagementSystem.Controllers
         private readonly IClubMemberService _clubMemberService;
         private readonly IImageHelperService _imageService;
         private readonly SignalRSender _signalRSender;
-        public PostsController(IPostService postService, IClubMemberService clubMemberService, IImageHelperService imageHelperService, SignalRSender signalRSender)
+        private readonly Cloudinary _cloudinary;
+        public PostsController(IPostService postService, 
+            IClubMemberService clubMemberService, 
+            IImageHelperService imageHelperService, 
+            SignalRSender signalRSender,  Cloudinary cloudinary)
         {
             _postService = postService;
             _clubMemberService = clubMemberService;
             _imageService = imageHelperService;
             _signalRSender = signalRSender;
+            _cloudinary = cloudinary;
         }
 
 
@@ -64,12 +70,51 @@ namespace ClubManagementSystem.Controllers
                 return Unauthorized();
             }
 
+            string imageUrl = null;
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(ImageFile.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    TempData["ErrorMessage"] = "Only .jpg, .jpeg, and .png files are allowed for post images.";
+                    return RedirectToAction("Details", "Clubs", new { id = clubId });
+                }
+
+                // Upload to Cloudinary
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(ImageFile.FileName, ImageFile.OpenReadStream()),
+                    Folder = "post_images",
+                    PublicId = $"post_{clubId}_{userId}_{DateTime.Now.Ticks}",
+                    //Transformation = new Transformation().Width(800).Height(600).Crop("fill")
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    TempData["ErrorMessage"] = "Image upload failed. Please try again.";
+                    return RedirectToAction("Details", "Clubs", new { id = clubId });
+                }
+
+                imageUrl = uploadResult.SecureUrl.ToString();
+            }
+
             try
             {
-                var post = await _postService.CreatePostAsync(model, ImageFile, userId, clubId);
+                var post = await _postService.CreatePostAsync(model, imageUrl, userId, clubId);
+                TempData["SuccessMessage"] = "Post created successfully!";
             }
             catch (UnauthorizedAccessException)
             {
+                TempData["ErrorMessage"] = "You are not authorized to create a post in this club.";
+                return RedirectToAction("Details", "Clubs", new { id = clubId });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
                 return RedirectToAction("Details", "Clubs", new { id = clubId });
             }
 
@@ -87,18 +132,13 @@ namespace ClubManagementSystem.Controllers
             var posts = await  _postService.GetPostsAsync(clubIdCheck, "Pending");
             var postViews = posts.Select(post =>
             {
-                string imgBase64 = "";
-                if (post.Image != null)
-                {
-                    imgBase64 = _imageService.ConvertToBase64(post.Image, "png");
-                }
-
+               
                 return new PostApproveDto
                 {
                     PostId = post.PostId,
                     Title = post.Title,
                     Content = post.Content,
-                    ImageBase64 = imgBase64,
+                    ImageBase64 = post.Image_Url,
                     CreatedAt = post.CreatedAt,
                     Username = post.ClubMember.User.Username,
                     Status = post.Status
@@ -150,16 +190,44 @@ namespace ClubManagementSystem.Controllers
             {
                 return Forbid();
             }
-
-            if (ImageFile != null)
+            string imageUrl = null;
+            if (ImageFile != null && ImageFile.Length > 0)
             {
-                using var ms = new MemoryStream();
-                await ImageFile.CopyToAsync(ms);
-                postDto.ImageBase64 = Convert.ToBase64String(ms.ToArray());
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(ImageFile.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    TempData["ErrorMessage"] = "Only .jpg, .jpeg, and .png files are allowed for post images.";
+                    return RedirectToAction("Details", "Posts", new { id = post.PostId });
+                }
+
+                // Upload to Cloudinary
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(ImageFile.FileName, ImageFile.OpenReadStream()),
+                    Folder = "post_images",
+                    PublicId = $"post_{postDto.PostId}_{userId}_{DateTime.Now.Ticks}",
+                    //Transformation = new Transformation().Width(800).Height(600).Crop("fill")
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    TempData["ErrorMessage"] = "Image upload failed. Please try again.";
+                    return RedirectToAction("Details", "Posts", new { id = post.PostId });
+                }
+
+                imageUrl = uploadResult.SecureUrl.ToString();
             }
+            
+                postDto.ImageBase64 = imageUrl;
+            
             try
             {
                 await _postService.UpdatePostAsync(postDto);
+                TempData["SuccessMessage"] = "Post edit successfully!";
                 return RedirectToAction("Details", "Posts", new { id = post.PostId });
             }
             catch (DbUpdateConcurrencyException)
@@ -181,14 +249,18 @@ namespace ClubManagementSystem.Controllers
             }
 
             var post = await _postService.GetPostAsync(postId);
-            if (post == null || post.ClubMember.User.UserId != userId)
-            {
-                return Forbid(); 
-            }
+            //if (post == null || post.ClubMember.User.UserId != userId)
+            //{
+            //    return Forbid();
+            //}
 
             await _postService.DeletePostAsync(postId);
 
             return RedirectToAction("Details", "Clubs", new { id = clubId });
         }
+
+       
+
+      
     }
 }

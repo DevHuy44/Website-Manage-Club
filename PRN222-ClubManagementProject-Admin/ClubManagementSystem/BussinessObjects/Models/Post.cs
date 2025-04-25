@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BussinessObjects.Models;
@@ -21,6 +19,8 @@ public partial class Post
     [Column(TypeName = "nvarchar(MAX)")]
     public string Content { get; set; } = null!;
     public byte[]? Image { get; set; }
+
+    public string? Image_Url { get; set; }
 
     [DataType(DataType.DateTime)]
     public DateTime? CreatedAt { get; set; } = DateTime.Now;

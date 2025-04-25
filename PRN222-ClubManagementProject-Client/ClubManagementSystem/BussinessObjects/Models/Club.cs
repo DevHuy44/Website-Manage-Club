@@ -15,6 +15,9 @@ public partial class Club
     public byte[]? Logo { get; set; }
     public byte[]? Cover { get; set; }
 
+    public string? Logo_Url { get; set; }
+    public string? Cover_Url { get; set; }
+
     public bool Status { get; set; }
 
     [StringLength(500)]
@@ -25,4 +28,5 @@ public partial class Club
 
     public virtual ICollection<ClubMember> ClubMembers { get; set; } = new List<ClubMember>();
     public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();
+    public virtual ICollection<Fee> Fees { get; set; } = new List<Fee>();
 }

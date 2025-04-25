@@ -1,0 +1,58 @@
+﻿@model BussinessObjects.Models.Event
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Event Details";
+    ViewData["_Layout"] = null;
+}
+
+<div class="modal-header bg-primary text-white">
+    <h5 class="modal-title fw-bold">📅 Event Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <h5 class="text-secondary">Event Information</h5>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3 fw-bold">Title:</dt>
+        <dd class="col-sm-9">@Model.EventTitle</dd>
+
+        <dt class="col-sm-3 fw-bold">Description:</dt>
+        <dd class="col-sm-9">@Model.EventDescription</dd>
+
+        <dt class="col-sm-3 fw-bold">Date:</dt>
+        <dd class="col-sm-9">
+            @(Model.EventDate != DateTime.MinValue ? Model.EventDate.ToString("yyyy-MM-dd HH:mm") : "<span class='text-danger fw-bold'>N/A</span>")
+        </dd>
+
+        <dt class="col-sm-3 fw-bold">Created At:</dt>
+        <dd class="col-sm-9">
+            @(Model.CreatedAt != DateTime.MinValue ? Model.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm") : "<span class='text-danger fw-bold'>N/A</span>")
+        </dd>
+
+        <dt class="col-sm-3 fw-bold">Creator:</dt>
+        <dd class="col-sm-9">
+            @(Model.CreatedByNavigation?.User?.Username ?? "<span class='text-danger fw-bold'>Unknown</span>")
+        </dd>
+    </dl>
+</div>
+
+<div class="modal-footer d-flex justify-content-between w-100">
+    <a asp-action="Tasks" asp-controller="Events" asp-route-EventId="@Model.EventId" asp-route-id="@Model.CreatedByNavigation.ClubId"
+       class="btn btn-primary fw-bold px-4 py-2 flex-fill text-center">
+        <i class="bi bi-list-task me-2"></i> View Tasks
+    </a>
+
+    @if(Model.Status!= "Cancelled" && Model.Status != "Finished"){
+        <button type="button" class="btn btn-warning fw-bold px-4 py-2 flex-fill"
+                onclick="loadEditModal(@Model.EventId)">
+            <i class="fas fa-edit"></i> Edit
+        </button>
+    }
+
+    <button type="button" class="btn btn-secondary fw-bold px-4 py-2 flex-fill" data-bs-dismiss="modal">
+        <i class="fas fa-times"></i> Close
+    </button>
+</div>

@@ -1,0 +1,70 @@
+﻿@model BussinessObjects.Models.Dtos.CommentDto
+@{
+    var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+}
+
+<link rel="stylesheet" href="~/css/comment-index.css">
+
+        <div class="comment-area-box media mt-4 d-flex" id="comment-@Model.CommentId">
+            <img src="@(string.IsNullOrEmpty(Model.User.ProfilePictureBase64) ? Url.Content("~/defaultPicture.jpg") : Model.User.ProfilePictureBase64)"
+                class="img-fluid"
+                style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;"
+                alt="Logo image">
+
+            <div class="d-flex flex-column w-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">@Model.User.Username</h4>
+                        <span class="date-comm font-sm text-capitalize text-color">
+                            <i class="ti-time mr-2"></i> @Model.CreatedAt
+                        </span>
+                    </div>
+                       
+                    <div class="d-flex justify-content-between align-items-center">
+                        @if (Model.User.UserId == userId)
+                        {
+                            <div>
+                                <button class="btn btn-sm btn-warning mr-2 py-2 px-3" onclick="showEditForm(@Model.CommentId)">Edit</button>
+                                <form asp-action="Delete" asp-controller="Comments" asp-route-id="@Model.CommentId" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger py-2 px-3" onclick="return confirm('Are you sure you want to delete this comment?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div id="comment-text-@Model.CommentId" class="comment-content mt-2">
+                    <p>@Model.CommentText</p>
+                </div>
+                <!-- Edit Form (hidden by default) -->
+                <form id="edit-form-@Model.CommentId" asp-action="Edit" asp-controller="Comments" method="post" class="d-none">
+                    <input type="hidden" asp-for="@Model.CommentId" value="@Model.CommentId" />
+                    <input type="hidden" asp-for="@Model.PostId" value="@Model.PostId" />
+                    <textarea asp-for="@Model.CommentText" class="form-control mb-2" maxlength="1000"></textarea>
+                    <div>
+                        <span asp-validation-for="@Model.CommentText" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success">Save</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit(@Model.CommentId)">Cancel</button>
+                </form>
+
+                    
+            </div>
+        </div>
+        @* <div class="comment-meta mt-2 mb-3"> *@
+        @*     <a href="#" class="text-underline">Reply</a> *@
+        @* </div> *@
+
+
+<script>
+    function showEditForm(commentId) {
+        document.getElementById("comment-text-" + commentId).classList.add("d-none");
+        document.getElementById("edit-form-" + commentId).classList.remove("d-none");
+    }
+
+    function cancelEdit(commentId) {
+        document.getElementById("edit-form-" + commentId).classList.add("d-none");
+        document.getElementById("comment-text-" + commentId).classList.remove("d-none");
+    }
+</script>

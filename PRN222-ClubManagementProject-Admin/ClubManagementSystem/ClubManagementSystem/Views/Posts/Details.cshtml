@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Details";
     var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+    bool isClubAdmin = User.Claims.Any(c => c.Type == "RoleName" && c.Value == "Admin");
 }
 <link rel="stylesheet" href="~/css/post-details.css">
 <link rel="stylesheet" href="~/css/comment-index.css">
@@ -29,7 +30,7 @@
                             <span class="text-uppercase font-sm letter-spacing-1">@Model.CreatedAt</span>
                         </div>
                         
-                        @if (Model.User.UserId == userId)
+                        @if (Model.User.UserId == userId || isClubAdmin)
                         {
                             @await Html.PartialAsync("~/Views/Posts/EditDelete.cshtml", Model)
                         }
@@ -160,4 +161,32 @@
             prompt("Copy this link:", postUrl);
         }
     }
+</script>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Popup success and fail -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Swal.fire({
+                title: "Success!",
+                text: successMessage,
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        }
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage) {
+            Swal.fire({
+                title: "Error!",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
 </script>

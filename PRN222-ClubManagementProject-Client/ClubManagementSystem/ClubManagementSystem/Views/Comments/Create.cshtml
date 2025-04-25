@@ -1,0 +1,17 @@
+﻿@model BussinessObjects.Models.Dtos.CommentDto
+
+<form asp-action="Create" asp-controller="Comments" class="comment-form mb-5 gray-bg p-5" id="comment-form">
+    <h3 class="mb-4 text-center">Leave a comment</h3>
+    <div class="row">
+        <div class="col-lg-12">
+            <textarea asp-for="CommentText"
+                      class="form-control mb-3"
+                      cols="30" rows="5"
+                      placeholder="Write your comment here..."></textarea>
+            <span asp-validation-for="CommentText" class="text-danger"></span>
+
+            <input type="hidden" asp-for="PostId" />
+        </div>
+    </div>
+    <input class="btn btn-primary" type="submit" value="Submit Comment">
+</form>

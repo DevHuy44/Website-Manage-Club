@@ -1,0 +1,76 @@
+﻿@model BussinessObjects.Models.Dtos.ClubRequestDetailDto
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<style>
+    .CoverPicture{
+        margin-top : 10px;
+    }
+</style>
+<h1>Details</h1>
+
+<section class="pt-5 padding-bottom">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <form asp-action="ApproveOrReject" asp-controller="ClubRequests" method="post">
+                    <input type="hidden" name="id" value="@Model.RequestId" />
+                    <div class="card shadow-lg p-4 mb-4 rounded">
+                        <div class="card-body text-center">
+                            <!-- Logo Picture -->
+                            <h5 class="card-title">Logo Picture</h5>
+                            <img src="@Model.Logo" alt="Club Logo"
+                                 id="LogoPictureId" class="rounded-circle border shadow-sm"
+                                 style="width: 120px; height: 120px; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div class="card shadow-lg p-4 mb-4 rounded">
+                        <div class="card-body text-center">
+                            <!-- Cover Picture -->
+                            <h5 class="card-title">Cover Picture</h5>
+                            <img src="@Model.Cover" alt="Club Cover"
+                                 id="CoverPictureId" class="rounded border shadow-sm"
+                                 style="width: 50%; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div class="card shadow-lg p-4 mb-4 rounded">
+                        <div class="card-body">
+                            <!-- Club Details -->
+                            <h4 class="text-center mb-4">Club Information</h4>
+
+                            <div class="form-group">
+                                <label for="name">Club's Name</label>
+                                <input class="form-control" value="@Model.ClubName" type="text" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Club's Description</label>
+                                <textarea class="form-control" rows="3" disabled>@Model.Description</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="createBy">Created by</label>
+                                <input class="form-control" value="@Model.UserName" type="text" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="createAt">Created At</label>
+                                <input class="form-control" value="@Model.CreatedAt" type="text" disabled>
+                            </div>
+
+                            <div class="d-flex mt-4">
+                                <button type="submit" name="status" value="Accept" class="btn btn-success w-45">Accept</button>
+                                <button type="submit" name="status" value="Reject" class="btn btn-danger w-45" style="margin-left: 10px">Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+

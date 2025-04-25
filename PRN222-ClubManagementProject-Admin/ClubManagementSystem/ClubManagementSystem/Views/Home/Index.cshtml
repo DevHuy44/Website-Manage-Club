@@ -2,34 +2,52 @@
 @{
 	ViewData["Title"] = "Home Page";
 }
+<section class="banner-slider">
+	<div class="slider-container">
+		<div class="banner-slide">
+			<img src="~/img/banner/banner_1.jpg" alt="Banner 1" class="img-fluid w-100">
 
-	<section>
+		</div>
+		<div class="banner-slide">
+			<img src="~/img/banner/banner_2.jpeg" alt="Banner 2" class="img-fluid w-100">
+
+		</div>
+		<div class="banner-slide">
+			<img src="~/img/banner/banner_4.jpg" alt="Banner 3" class="img-fluid w-100">
+		</div>
+	</div>
+</section>
+
+
+<section>
 	<h2 class="mt-4 mb-4 fw-bold text-header text-center">
 		<i class="ti-calendar"></i> Ongoing Events
 	</h2>
 	<div class="border-bottom mb-4"></div>
 
-		<div class="d-flex gap-3 p-2 justify-content-center overflow-auto" style="white-space: nowrap;">
-			@if (Model.Events.Any())
+	<div class="d-flex gap-3 p-2 justify-content-center overflow-auto flex-wrap ">
+		@if (Model.Events.Any())
+		{
+			@foreach (var item in Model.Events)
 			{
-				@foreach (var item in Model.Events)
-				{
-					<div class="card border-primary flex-shrink-0 shadow-sm" style="width: 300px;">
-						<div class="card-header bg-primary text-white d-flex align-items-center">
-							<i class="fas fa-calendar-alt me-2"></i>
-							<span class="fw-bold">Live Now</span>
-						</div>
-						<div class="card-body">
-							<h5 class="card-title text-primary fw-bold">@item.EventTitle</h5>
-							<h6 class="card-subtitle mb-2 text-muted">
-								<i class="far fa-clock"></i>
-								<span>@item.EventDate.ToString("MMM dd, yyyy hh:mm tt")</span>
-							</h6>
-							<p class="card-text text-truncate" style="max-width: 250px;">@item.EventDescription</p>
-							<p class="card-text fw-bold">@item.CreatedByNavigation.Club.ClubName</p>
-						</div>
+				<div class="card border-primary flex-shrink-0 shadow-sm" style="width: 300px;">
+					<div class="card-header text-dark d-flex align-items-center" style="background-color: #EED5D2">
+						<i class="fas fa-calendar-alt me-2"></i>
+						<span class="fw-bold">Live Now</span>
 					</div>
-				}
+					<div class="card-body">
+						<div class="text-truncate-2-line fw-bold" style="font-size: 1.25rem; color: #BC8F8F">
+							@item.EventTitle
+						</div>
+						<h6 class="card-subtitle mb-2 text-muted">
+							<i class="far fa-clock"></i>
+							<span>@item.EventDate.ToString("MMM dd, yyyy hh:mm tt")</span>
+						</h6>
+						<p class="card-text text-truncate" style="max-width: 250px;">@item.EventDescription</p>
+						<p class="card-text fw-bold">@item.CreatedByNavigation.Club.ClubName</p>
+					</div>
+				</div>
+			}
 		}
 		else
 		{
@@ -38,101 +56,141 @@
 				<p class="fw-bold">No upcoming events at the moment.</p>
 			</div>
 		}
-		</div>
-	</section>
+	</div>
+</section>
 
-	<section class="slider mt-4">
+<section class="slider mt-4">
 	<h2 class="mt-5 mb-4 fw-bold text-header text-center">
 		<i class="ti-pencil-alt"></i> Latest Posts
 	</h2>
 	<div class="border-bottom mb-4"></div>
 
-		<div class="container-fluid">
-			<div class="row no-gutters">
-				<div class="col-lg-12 col-sm-12 col-md-12 slider-wrap">
-					@if (Model.Posts.Any())
-{
-						@foreach (var post in Model.Posts.Take(7))
-						{
-							<div class="slider-item">
-								<div class="slider-item-content">
-									<div class="post-thumb mb-4">
+	<section class="container-fluid">
+		@* <div class="row no-gutters"> *@
+			@* <div class="col-lg-12 col-sm-12 col-md-12 slider-wrap">
+				@if (Model.Posts.Any())
+				{
+					@foreach (var post in Model.Posts.Take(7))
+					{
+						<div class="slider-item">
+							<div class="slider-item-content">
+								<div class="post-thumb mb-4">
 									<a href="/Posts/Details/@post.PostId">
 										<img src="@(string.IsNullOrEmpty(post.ImageBase64) ? Url.Content("~/defaultImage.jpg") : post.ImageBase64)"
-											alt="Post Image"
-											class="img-fluid" style="width: 700px; height: 450px">
-										</a>
-										</div>
+											 alt="Post Image"
+											 class="img-fluid" style="width: 700px; height: 450px">
+									</a>
+								</div>
 
-										<div class="slider-post-content">
-											<span class="cat-name text-color font-sm font-extra text-uppercase letter-spacing">@post.Club.ClubName</span>
+								<div class="slider-post-content">
+									<span class="cat-name text-color font-sm font-extra text-uppercase letter-spacing">@post.Club.ClubName</span>
 									<h3 class="mt-1"><a href="/Posts/Details/@post.PostId">@post.Title</a></h3>
-											<span class="text-muted text-capitalize">@post.CreatedAt</span>
-										</div>
+									<span class="text-muted text-capitalize">@post.CreatedAt</span>
 								</div>
 							</div>
-						}
-					}
-					else
-					{
-						<div class="text-muted p-4 text-center">
-							<i class="fas fa-newspaper fa-2x mb-2"></i>
-							<p class="fw-bold">No posts available at the moment.</p>
 						</div>
 					}
-				</div>
-			</div>
-		</div>
-	</section>
+				}
+				else
+				{
+					<div class="text-muted p-4 text-center">
+						<i class="fas fa-newspaper fa-2x mb-2"></i>
+						<p class="fw-bold">No posts available at the moment.</p>
+					</div>
+				}
+			</div> *@
 
-	<section class="section-padding">
+			<!-- Thêm class mySwiper để SwiperJS nhận diện -->
+		<section class="banner-slider">
+			<div class="slider-container2">
+				@foreach (var post in Model.Posts.Take(7))
+				{
+					<div class="slider-item">
+						<!-- ✅ dùng div đơn giản -->
+						<div class="slider-item-content">
+							<div class="post-thumb mb-4">
+								<a href="/Posts/Details/@post.PostId">
+									<img src="@(string.IsNullOrEmpty(post.ImageBase64) ? Url.Content("~/defaultImage.jpg") : post.ImageBase64)"
+										 alt="Post Image"
+										 class="img-fluid" style="width: 700px; height: 450px">
+								</a>
+							</div>
+							<div class="slider-post-content">
+								<span class="cat-name text-color font-sm font-extra text-uppercase letter-spacing">@post.Club.ClubName</span>
+								<h3 class="mt-1"><a href="/Posts/Details/@post.PostId">@post.Title</a></h3>
+								<span class="text-muted text-capitalize">@post.CreatedAt</span>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+
+
+				<!-- Optional: Thêm nút điều hướng -->
+				
+				@* <div class="swiper-pagination"></div> *@
+				@* <div class="swiper-pagination mt-4"></div> *@
+			<div class="swiper-pagination"></div>
+			@* </div> *@
+
+		</section>
+	
+</section>
+
+<section class="section-padding">
 	<h2 class="mt-4 mb-4 fw-bold text-success text-header text-center">
 		<i class="ti-flag-alt"></i> Newest Clubs
 	</h2>
 	<div class="border-bottom mb-4"></div>
 
 
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<div class="row">
-						@if (Model.Clubs.Any())
-{
-							@foreach (var club in Model.Clubs.Take(8))
-							{
-								<div class="col-lg-3 col-md-6">
-									<article class="post-grid mb-5">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<div class="row">
+					@if (Model.Clubs.Any())
+					{
+						@foreach (var club in Model.Clubs.Take(8))
+						{
+							<div class="col-lg-3 col-md-6">
+								<article class="post-grid mb-5">
 									<a class="post-thumb mb-4 d-block" href="/Clubs/Details/@club.ClubId">
 										<img src="@(string.IsNullOrEmpty(club.LogoBase64) ? Url.Content("~/defaultPicture.jpg") : club.LogoBase64)"
-											alt="Club Logo Image" 
-											class="img-fluid w-100"
-											style="width: 300px; height: 300px">
-										</a>
-										<span class="cat-name text-color font-extra text-uppercase letter-spacing-1 text-sm">Club</span>
-										<h3 class="mt-1"><a href="/Clubs/Details/@club.ClubId">@club.ClubName</a></h3>
+											 alt="Club Logo Image"
+											 class="img-fluid w-100"
+											 style="width: 300px; height: 300px">
+									</a>
+									<span class="cat-name text-color font-extra text-uppercase letter-spacing-1 text-sm">Club</span>
+									<h3 class="mt-1"><a href="/Clubs/Details/@club.ClubId">@club.ClubName</a></h3>
 
-										<span class="text-muted letter-spacing text-uppercase font-sm">@club.CreatedAt</span>
+									<span class="text-muted letter-spacing text-uppercase font-sm">@club.CreatedAt</span>
 
-									</article>
-								</div>
-							}
-						}
-						else
-						{
-							<div class="text-muted p-4 text-center">
-								<i class="fas fa-users fa-2x mb-2"></i>
-								<p class="fw-bold">No clubs available at the moment.</p>
+								</article>
 							</div>
 						}
-					</div>
+					}
+					else
+					{
+						<div class="text-muted p-4 text-center">
+							<i class="fas fa-users fa-2x mb-2"></i>
+							<p class="fw-bold">No clubs available at the moment.</p>
+						</div>
+					}
 				</div>
-				
 			</div>
+
 		</div>
-	</section>
+	</div>
+</section>
 
 
 <!-- Popup for successfully message -->
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 	document.addEventListener("DOMContentLoaded", function () {
@@ -149,4 +207,3 @@
 </script>
 
 
-	

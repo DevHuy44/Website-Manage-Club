@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using BussinessObjects.Models;
 using BussinessObjects.Models.Dtos;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using ClubManagementSystem.Controllers.Filter;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,11 +23,13 @@ namespace ClubManagementSystem.Controllers
         private readonly IAccountService _accountService;
         private readonly IConfiguration _configuration;
         private readonly IImageHelperService _imageService;
-        public AccountController(IConfiguration configuration, IAccountService accountService, IImageHelperService imageHelperService)
+        private readonly Cloudinary _cloudinary;
+        public AccountController(IConfiguration configuration, IAccountService accountService, IImageHelperService imageHelperService, Cloudinary cloudinary)
         {
             _accountService = accountService;
             _configuration = configuration;
             _imageService = imageHelperService;
+            _cloudinary = cloudinary;
         }
 
         [AllowAnonymous]
@@ -48,9 +52,9 @@ namespace ClubManagementSystem.Controllers
 
             var adminEmail = _configuration["AdminAccount:Gmail"];
             var adminPassword = _configuration["AdminAccount:Password"];
-            var profilePicture = user.ProfilePicture != null
+            var profilePicture = user.ImagePicture!=null ? user.ImagePicture : (user.ProfilePicture != null
                 ? _imageService.ConvertToBase64(user.ProfilePicture, "png")
-                : string.Empty;
+                : string.Empty);
             //Check role
             string role;           
             if (user.Email == adminEmail && user.Password == adminPassword)
@@ -76,6 +80,7 @@ namespace ClubManagementSystem.Controllers
             foreach (var clubRole in clubMember)
             {
                 claims.Add(new Claim($"ClubRole_{clubRole.ClubId}", clubRole.Role.RoleName));
+                claims.Add(new Claim($"RoleName", clubRole.Role.RoleName));
             }
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -120,7 +125,7 @@ namespace ClubManagementSystem.Controllers
             if (user != null)
             {
                 
-                profilePicture = _imageService.ConvertToBase64(user.ProfilePicture, "png");
+                profilePicture = user.ImagePicture!=null ? user.ImagePicture : _imageService.ConvertToBase64(user.ProfilePicture, "png");
                 string role= "User";
                 var clubMember = await _accountService.CheckRole(user.UserId);
                 var claims = new List<Claim>
@@ -135,6 +140,7 @@ namespace ClubManagementSystem.Controllers
                 foreach (var clubRole in clubMember)
                 {
                     claims.Add(new Claim($"ClubRole_{clubRole.ClubId}", clubRole.Role.RoleName));
+                    claims.Add(new Claim($"RoleName", clubRole.Role.RoleName));
                 }
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -290,28 +296,36 @@ namespace ClubManagementSystem.Controllers
                     return View();
                 }
 
-                // Convert image to byte array
-                byte[] profilePictureBytes;
-                using (var memoryStream = new MemoryStream())
+                // Upload to Cloudinary
+                var uploadParams = new ImageUploadParams
                 {
-                    await profilePicture.CopyToAsync(memoryStream);
-                    profilePictureBytes = memoryStream.ToArray();
+                    File = new FileDescription(profilePicture.FileName, profilePicture.OpenReadStream()),
+                    Folder = "profile_pictures", // optional: folder in Cloudinary
+                    PublicId = $"user_{User.FindFirst(ClaimTypes.NameIdentifier)?.Value}_{DateTime.Now.Ticks}", // optional: custom naming
+                    Transformation = new Transformation().Width(300).Height(300).Crop("fill") // optional resize
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    ModelState.AddModelError("profilePicture", "Upload failed. Please try again.");
+                    return View();
                 }
 
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var imageUrl = uploadResult.SecureUrl.ToString();
 
+                // Save imageUrl to DB
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId != null)
                 {
                     var user = await _accountService.FindUserAsync(int.Parse(userId));
-
                     if (user != null)
                     {
-                        // Update  database
-                        user.ProfilePicture = profilePictureBytes;
+                        user.ImagePicture = imageUrl; // Assuming your User model has ProfilePictureUrl
                         await _accountService.UpdateUserAsync(user);
 
-                        var profilePictureBase64 = _imageService.ConvertToBase64(profilePictureBytes, fileExtension);
-                        HttpContext.Session.SetString("userPicture", profilePictureBase64);
+                        HttpContext.Session.SetString("userPicture", imageUrl); // Store URL in session
 
                         return RedirectToAction("Edit", "Account");
                     }

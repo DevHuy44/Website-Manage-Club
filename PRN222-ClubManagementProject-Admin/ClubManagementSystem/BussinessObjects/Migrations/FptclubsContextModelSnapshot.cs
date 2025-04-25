@@ -41,6 +41,9 @@ namespace BussinessObjects.Migrations
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("cover");
 
+                    b.Property<string>("Cover_Url")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
@@ -55,6 +58,9 @@ namespace BussinessObjects.Migrations
                     b.Property<byte[]>("Logo")
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("logo");
+
+                    b.Property<string>("Logo_Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Status")
                         .ValueGeneratedOnAdd()
@@ -132,6 +138,9 @@ namespace BussinessObjects.Migrations
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("cover");
 
+                    b.Property<string>("Cover_Url")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
@@ -146,6 +155,9 @@ namespace BussinessObjects.Migrations
                     b.Property<byte[]>("Logo")
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("logo");
+
+                    b.Property<string>("Logo_Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .ValueGeneratedOnAdd()
@@ -318,6 +330,55 @@ namespace BussinessObjects.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("BussinessObjects.Models.Fee", b =>
+                {
+                    b.Property<int>("FeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("fee_id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeeId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<int>("ClubId")
+                        .HasColumnType("int")
+                        .HasColumnName("club_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime")
+                        .HasColumnName("due_date");
+
+                    b.Property<string>("FeeDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("fee_description");
+
+                    b.Property<string>("FeeType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("fee_type");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("payment_method");
+
+                    b.HasKey("FeeId");
+
+                    b.HasIndex("ClubId");
+
+                    b.ToTable("Fees");
+                });
+
             modelBuilder.Entity("BussinessObjects.Models.JoinRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -346,6 +407,63 @@ namespace BussinessObjects.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("JoinRequests");
+                });
+
+            modelBuilder.Entity("BussinessObjects.Models.MembershipFee", b =>
+                {
+                    b.Property<int>("MembershipFeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("membership_fee_id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MembershipFeeId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(getdate())");
+
+                    b.Property<int>("FeeId")
+                        .HasColumnType("int")
+                        .HasColumnName("fee_id");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int")
+                        .HasColumnName("member_id");
+
+                    b.Property<int?>("NotificationId")
+                        .HasColumnType("int")
+                        .HasColumnName("notification_id");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("paid_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Pending")
+                        .HasColumnName("status");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("transaction_id");
+
+                    b.HasKey("MembershipFeeId");
+
+                    b.HasIndex("FeeId");
+
+                    b.HasIndex("MemberId");
+
+                    b.HasIndex("NotificationId")
+                        .IsUnique()
+                        .HasFilter("[notification_id] IS NOT NULL");
+
+                    b.ToTable("MembershipFees");
                 });
 
             modelBuilder.Entity("BussinessObjects.Models.Notification", b =>
@@ -418,6 +536,9 @@ namespace BussinessObjects.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)")
                         .HasColumnName("image");
+
+                    b.Property<string>("Image_Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .ValueGeneratedOnAdd()
@@ -548,6 +669,9 @@ namespace BussinessObjects.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("email");
 
+                    b.Property<string>("ImagePicture")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -581,20 +705,21 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.Club", "Club")
                         .WithMany("ClubMembers")
                         .HasForeignKey("ClubId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__ClubMembe__club___4316F928");
 
                     b.HasOne("BussinessObjects.Models.Role", "Role")
                         .WithMany("ClubMembers")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__ClubMembe__role___44FF419A");
 
                     b.HasOne("BussinessObjects.Models.User", "User")
                         .WithMany("ClubMembers")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__ClubMembe__user___440B1D61");
 
@@ -610,6 +735,7 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.User", "User")
                         .WithMany("ClubRequests")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__ClubReque__user___656C112C");
 
@@ -621,6 +747,7 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.ClubMember", "CreatedByNavigation")
                         .WithMany("Tasks")
                         .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__Tasks__created_b__571DF1D5");
 
@@ -640,13 +767,13 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BussinessObjects.Models.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Post");
@@ -670,10 +797,22 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.ClubMember", "CreatedByNavigation")
                         .WithMany("Events")
                         .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__Events__created___52593CB8");
 
                     b.Navigation("CreatedByNavigation");
+                });
+
+            modelBuilder.Entity("BussinessObjects.Models.Fee", b =>
+                {
+                    b.HasOne("BussinessObjects.Models.Club", "Club")
+                        .WithMany("Fees")
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Club");
                 });
 
             modelBuilder.Entity("BussinessObjects.Models.JoinRequest", b =>
@@ -695,11 +834,38 @@ namespace BussinessObjects.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BussinessObjects.Models.MembershipFee", b =>
+                {
+                    b.HasOne("BussinessObjects.Models.Fee", "Fee")
+                        .WithMany("MembershipFees")
+                        .HasForeignKey("FeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BussinessObjects.Models.ClubMember", "ClubMember")
+                        .WithMany("MembershipFees")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BussinessObjects.Models.Notification", "Notification")
+                        .WithOne("MembershipFee")
+                        .HasForeignKey("BussinessObjects.Models.MembershipFee", "NotificationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ClubMember");
+
+                    b.Navigation("Fee");
+
+                    b.Navigation("Notification");
+                });
+
             modelBuilder.Entity("BussinessObjects.Models.Notification", b =>
                 {
                     b.HasOne("BussinessObjects.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__Notificat__user___60A75C0F");
 
@@ -711,6 +877,7 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.ClubMember", "ClubMember")
                         .WithMany("Posts")
                         .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__Posts__created_b__49C3F6B7");
 
@@ -722,13 +889,13 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.Post", "Post")
                         .WithMany("Reactions")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BussinessObjects.Models.User", "User")
                         .WithMany("Reactions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Post");
@@ -741,13 +908,14 @@ namespace BussinessObjects.Migrations
                     b.HasOne("BussinessObjects.Models.ClubMember", "Membership")
                         .WithMany("TaskAssignments")
                         .HasForeignKey("MembershipId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__TaskAssig__membe__5BE2A6F2");
 
                     b.HasOne("BussinessObjects.Models.ClubTask", "Task")
                         .WithMany("TaskAssignments")
                         .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK__TaskAssig__task___5AEE82B9");
 
@@ -760,12 +928,16 @@ namespace BussinessObjects.Migrations
                 {
                     b.Navigation("ClubMembers");
 
+                    b.Navigation("Fees");
+
                     b.Navigation("JoinRequests");
                 });
 
             modelBuilder.Entity("BussinessObjects.Models.ClubMember", b =>
                 {
                     b.Navigation("Events");
+
+                    b.Navigation("MembershipFees");
 
                     b.Navigation("Posts");
 
@@ -782,6 +954,17 @@ namespace BussinessObjects.Migrations
             modelBuilder.Entity("BussinessObjects.Models.Event", b =>
                 {
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("BussinessObjects.Models.Fee", b =>
+                {
+                    b.Navigation("MembershipFees");
+                });
+
+            modelBuilder.Entity("BussinessObjects.Models.Notification", b =>
+                {
+                    b.Navigation("MembershipFee")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BussinessObjects.Models.Post", b =>

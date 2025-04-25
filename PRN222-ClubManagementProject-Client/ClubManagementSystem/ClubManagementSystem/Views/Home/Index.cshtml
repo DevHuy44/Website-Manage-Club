@@ -25,18 +25,20 @@
 	</h2>
 	<div class="border-bottom mb-4"></div>
 
-	<div class="d-flex gap-3 p-2 justify-content-center overflow-auto" style="white-space: nowrap;">
+	<div class="d-flex gap-3 p-2 justify-content-center overflow-auto flex-wrap">
 		@if (Model.Events.Any())
 		{
 			@foreach (var item in Model.Events)
 			{
 				<div class="card border-primary flex-shrink-0 shadow-sm" style="width: 300px;">
-					<div class="card-header bg-primary text-white d-flex align-items-center">
+					<div class="card-header text-dark d-flex align-items-center" style="background-color: #EED5D2">
 						<i class="fas fa-calendar-alt me-2"></i>
 						<span class="fw-bold">Live Now</span>
 					</div>
 					<div class="card-body">
-						<h5 class="card-title text-primary fw-bold">@item.EventTitle</h5>
+						<div class="text-truncate-2-line fw-bold" style="font-size: 1.25rem; color: #BC8F8F">
+							@item.EventTitle
+						</div>
 						<h6 class="card-subtitle mb-2 text-muted">
 							<i class="far fa-clock"></i>
 							<span>@item.EventDate.ToString("MMM dd, yyyy hh:mm tt")</span>

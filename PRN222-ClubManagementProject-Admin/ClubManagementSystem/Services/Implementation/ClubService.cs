@@ -38,7 +38,7 @@ namespace Services.Implementation
                 {
                     UserId = member.UserId,
                     Username = member.User.Username,
-                    ProfilePictureBase64 = _imageHelperService.ConvertToBase64(member.User.ProfilePicture, "png")
+                    ProfilePictureBase64 = member.User.ImagePicture !=null ? member.User.ImagePicture: _imageHelperService.ConvertToBase64(member.User.ProfilePicture, "png") 
                 })
                 .ToList();
 
@@ -55,7 +55,7 @@ namespace Services.Implementation
                 PostId = post.PostId,
                 Title = post.Title,
                 Content = post.Content,
-                ImageBase64 = _imageHelperService.ConvertToBase64(post.Image, "png"),
+                ImageBase64 = post.Image_Url,
                 CreatedAt = post.CreatedAt,
                 Status = post.Status,
 
@@ -73,8 +73,8 @@ namespace Services.Implementation
             {
                 ClubId = club.ClubId,
                 ClubName = club.ClubName,
-                LogoBase64 = _imageHelperService.ConvertToBase64(club.Logo, "png"),
-                CoverBase64 = _imageHelperService.ConvertToBase64(club.Cover, "png"),
+                LogoBase64 = club.Logo_Url,
+                CoverBase64 = club.Cover_Url,
                 Description = club.Description,
                 ClubMembers = clubMemberDtos,
                 Posts = postDtos,
@@ -113,13 +113,13 @@ namespace Services.Implementation
                 club.ClubName = clubEditDto.ClubName;
                 club.Description = clubEditDto.Description;
             }
-            if (clubEditDto.Logo != null)
+            if (clubEditDto.Logo_Url != null)
             {
-                club.Logo = clubEditDto.Logo;
+                club.Logo_Url = clubEditDto.Logo_Url;
             }
-            if (clubEditDto.Cover != null)
+            if (clubEditDto.Cover_Url != null)
             {
-                club.Cover = clubEditDto.Cover;
+                club.Cover_Url = clubEditDto.Cover_Url;
             }
             await _clubRepository.UpdateClubAsync(club);
             return (true, "Club update successfully!");

@@ -30,6 +30,8 @@ public partial class User
     public string? Password { get; set; }
     public byte[]? ProfilePicture { get; set; }
 
+    public string? ImagePicture { get; set; }
+
     [DataType(DataType.DateTime)]
     public DateTime? CreatedAt { get; set; }
 
