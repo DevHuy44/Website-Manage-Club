@@ -1,0 +1,67 @@
+﻿@model IEnumerable<BussinessObjects.Models.ClubRequest>
+
+@{
+    ViewData["Title"] = "Club Requests";
+}
+<link rel="stylesheet" href="~/css/ClubRequestIndex.css">
+
+<section class="ClubRequestIndex container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold"> Club Requests</h2>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle shadow-sm">
+            <thead class="custom-header text-white text-center">
+                <tr>
+                    <th>🏆 @Html.DisplayNameFor(model => model.ClubName)</th>
+                    <th>📄 @Html.DisplayNameFor(model => model.Description)</th>
+                    <th>✅ @Html.DisplayNameFor(model => model.Status)</th>
+                    <th>📅 @Html.DisplayNameFor(model => model.CreatedAt)</th>
+                    <th>👤 @Html.DisplayNameFor(model => model.User)</th>
+                    <th>⚙️ Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="text-center">
+                        <td class="fw-semibold">@Html.DisplayFor(modelItem => item.ClubName)</td>
+                        <td class="text-truncate" style="max-width: 200px;">@Html.DisplayFor(modelItem => item.Description)</td>
+                        <td>
+                            <span class="badge
+                                @(item.Status == "Pending" ? "bg-warning text-dark" :
+                                  item.Status == "Approved" ? "bg-success" : "bg-danger")">
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </span>
+                        </td>
+                        <td>@(item.CreatedAt?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                        <td>@Html.DisplayFor(modelItem => item.User.Username)</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.RequestId" class="btn btn-sm btn-info text-white">
+                                 Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Swal.fire({
+                title: "Success!",
+                text: successMessage,
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+</script>

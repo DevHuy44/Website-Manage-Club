@@ -1,0 +1,31 @@
+﻿@model BussinessObjects.Models.Event
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Delete";
+}
+
+<div class="modal-header">
+    <h5 class="modal-title text-danger fw-bold">Confirm Deletion</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <p class="mb-3 text-muted">Are you sure you want to delete this event?</p>
+
+    <div class="card border-danger shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title text-dark fw-bold">📌 @Model.EventTitle</h5>
+            <p class="card-text text-muted">@Model.EventDescription</p>
+            <p class="mb-0"><strong>⏰ Date:</strong> @Model.EventDate.ToString("f")</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" name="id" value="@Model.EventId" />
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    </form>
+</div>

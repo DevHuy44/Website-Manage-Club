@@ -26,7 +26,7 @@ public partial class Event
     public DateTime EventDate { get; set; }
 
     [DataType(DataType.DateTime)]
-    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
     [ForeignKey("CreatedBy")]
     public virtual ClubMember CreatedByNavigation { get; set; } = null!;

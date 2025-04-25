@@ -27,4 +27,5 @@ public partial class Notification
     [ForeignKey("UserId")]
     [JsonIgnore]
     public virtual User User { get; set; } = null!;
+    public MembershipFee MembershipFee { get; set; }
 }

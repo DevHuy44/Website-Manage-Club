@@ -1,0 +1,47 @@
+﻿@model BussinessObjects.Models.Event
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Create";
+}
+
+<h4 class="mb-3">Create Event</h4>
+<hr />
+
+<div class="row">
+    <div class="">
+        <form id="createEventForm" asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="clubID" value="@ViewBag.ClubID" />
+
+            <div class="mb-3">
+                <label asp-for="EventTitle" class="form-label"></label>
+                <input asp-for="EventTitle" class="form-control" placeholder="Enter event title..." />
+                <span asp-validation-for="EventTitle" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EventDescription" class="form-label"></label>
+                <textarea asp-for="EventDescription" class="form-control" rows="3" placeholder="Enter event description..."></textarea>
+                <span asp-validation-for="EventDescription" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EventDate" class="form-label"></label>
+                <input asp-for="EventDate" type="datetime-local" class="form-control" />
+                <span asp-validation-for="EventDate" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

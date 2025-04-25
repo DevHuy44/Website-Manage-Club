@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Thống kê Câu lạc bộ";
+}
+
+<h1>Thống kê hoạt động Câu lạc bộ</h1>
+
+<div>
+    <label for="targetMonth">Chọn tháng:</label>
+    <input type="month" id="targetMonth" value="@ViewBag.TargetMonth" />
+    <button onclick="loadStats()">Cập nhật</button>
+</div>
+
+<div>
+    <h2>Câu lạc bộ có nhiều thành viên tham gia nhất</h2>
+    <canvas id="memberChart" width="800" height="400"></canvas>
+</div>
+
+<div>
+    <h2>Câu lạc bộ tổ chức nhiều sự kiện nhất</h2>
+    <canvas id="eventChart" width="800" height="400"></canvas>
+</div>
+
+<div>
+    <h2>Câu lạc bộ có nhiều bài đăng nhất</h2>
+    <canvas id="postChart" width="800" height="400"></canvas>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let memberChart, eventChart, postChart;
+
+        // Hàm khởi tạo biểu đồ
+        function initCharts() {
+            const memberCtx = document.getElementById('memberChart').getContext('2d');
+            memberChart = new Chart(memberCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ label: 'Số lượng thành viên', data: [], backgroundColor: 'rgba(54, 162, 235, 0.2)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1 }] },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            const eventCtx = document.getElementById('eventChart').getContext('2d');
+            eventChart = new Chart(eventCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ label: 'Số lượng sự kiện', data: [], backgroundColor: 'rgba(255, 99, 132, 0.2)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 1 }] },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            const postCtx = document.getElementById('postChart').getContext('2d');
+            postChart = new Chart(postCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ label: 'Số lượng bài đăng', data: [], backgroundColor: 'rgba(75, 192, 192, 0.2)', borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 1 }] },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // Hàm tải dữ liệu và vẽ biểu đồ
+        function loadStats() {
+            const targetMonth = document.getElementById('targetMonth').value;
+            fetch(`/ClubStats/GetStats?targetMonth=${targetMonth}`, {
+                credentials: "include"
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Received stats: ", data);
+
+                    // Cập nhật biểu đồ thành viên
+                    memberChart.data.labels = data.members.map(item => item.item1);
+                    memberChart.data.datasets[0].data = data.members.map(item => item.item2);
+                    memberChart.update();
+
+                    // Cập nhật biểu đồ sự kiện
+                    eventChart.data.labels = data.events.map(item => item.item1);
+                    eventChart.data.datasets[0].data = data.events.map(item => item.item2);
+                    eventChart.update();
+
+                    // Cập nhật biểu đồ bài đăng
+                    postChart.data.labels = data.posts.map(item => item.item1);
+                    postChart.data.datasets[0].data = data.posts.map(item => item.item2);
+                    postChart.update();
+                })
+                .catch(err => console.error("Error fetching stats: ", err));
+        }
+
+        // Khởi tạo biểu đồ khi trang tải
+        document.addEventListener("DOMContentLoaded", function () {
+            initCharts();
+            loadStats(); // Tải dữ liệu lần đầu
+        });
+    </script>
+}

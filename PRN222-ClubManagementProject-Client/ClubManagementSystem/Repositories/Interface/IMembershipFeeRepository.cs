@@ -24,5 +24,7 @@ namespace Repositories.Interface
         Task<MembershipFee> GetMembershipFeeByIdAsync(int membershipFeeId, int userId);
         // Phương thức mới
         Task<List<MembershipFee>> GetMembershipFeesByDueDateAsync(DateTime dueDate, string status);
+
+        Task<List<MembershipFee>> GetMembershipFeesByOverDateAsync(string status);
     }
 }

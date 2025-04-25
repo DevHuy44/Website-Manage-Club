@@ -1,0 +1,270 @@
+﻿@model IEnumerable<Dictionary<string, BussinessObjects.Models.Event>>
+
+@{
+    ViewData["Title"] = "Index";
+    var dropdown = ViewBag.WeekDropdown;
+    var days = ViewBag.WeekDays;
+    var daysOfWeek = ViewBag.DaysOfWeek;
+    var clubID = ViewBag.ClubID;
+    var EventModels = Model.ToList<Dictionary<string, BussinessObjects.Models.Event>>();
+    var timeSlots = new List<string> { "Morning", "Noon", "Afternoon", "Evening" };
+    bool isClubAdmin = User.Claims.Any(c => c.Type == "RoleName" && c.Value == "Admin");
+}
+
+<h1 class="mb-4 text-primary fw-bold">📅 Event Schedule</h1>
+
+<!-- Week Selection Form -->
+<div class="mb-4 p-3 bg-light border rounded shadow-sm">
+    <form id="weekForm" asp-action="Index" method="get" class="d-flex align-items-center gap-3" asp-route-id="@clubID">
+        <label class="fw-bold text-secondary">Select a Week:</label>
+        <select name="week" asp-items="dropdown" class="form-select w-auto border-primary" onchange="this.form.submit()">
+            <option value="">-- Select Week --</option>
+        </select>
+        <input type="hidden" value="@clubID" name="clubID" />
+    </form>
+
+    <!-- Create Event Button -->
+    @if (isClubAdmin)
+    {
+        <button class="btn btn-success" onclick="loadCreateModal()">➕ Create Event</button>
+    }
+</div>
+
+<!-- Event Table -->
+<div class="table-responsive">
+    <table class="table table-hover table-bordered text-center align-middle shadow-sm">
+        <thead class="table-primary">
+            <tr>
+                <th class="fw-bold">Time Slot</th>
+                @foreach (var day in days)
+                {
+                    <th class="fw-bold">@Html.Raw(day)</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < timeSlots.Count; i++)
+            {
+                <tr>
+                    <td class="fw-bold text-primary">@timeSlots[i]</td>
+                    @foreach (var dayOfWeek in daysOfWeek)
+                    {
+                        <td>
+                            @if (EventModels[i].ContainsKey(dayOfWeek) && EventModels[i][dayOfWeek] != null)
+                            {
+                                var eventItem = EventModels[i][dayOfWeek];
+                                <div class="p-2 border rounded bg-white shadow-sm text-start" role="button"
+                                     data-bs-toggle="modal" data-bs-target="#eventDetailsModal"
+                                     onclick="loadEventDetails(@eventItem.EventId)">
+                                    <h6 class="text-dark fw-bold">📌 @Html.Raw(eventItem.EventTitle)</h6>
+                                    <p class="text-muted mb-1"><strong>🧑 Created by:</strong> @(eventItem.CreatedByNavigation?.User?.Username ?? "N/A")</p>
+                                    <p class="text-muted"><strong>⏰ Time:</strong> @eventItem.EventDate.ToString("HH:mm")</p>
+
+                                    @* Status with color-coded badge *@
+                                    @if (!string.IsNullOrEmpty(eventItem.Status))
+                                    {
+                                        <p class="fw-bold">
+                                            Status:
+                                            <span class="badge
+                                                @(eventItem.Status == "On Going" ? "bg-success" :
+                                                    eventItem.Status == "Not Yet" ? "bg-warning text-dark" :
+                                                    eventItem.Status == "Finished" ? "bg-primary" :
+                                                    eventItem.Status == "Cancelled" ? "bg-danger" : "bg-secondary")">
+                                                @eventItem.Status
+                                            </span>
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted fst-italic">Status: Unknown</p>
+                                    }
+                                </div>
+                                @if(eventItem.Status != "Finished"){
+                                    <button class="btn btn-danger btn-sm mt-2" data-bs-toggle="modal"
+                                            data-bs-target="#deleteEventModal"
+                                            onclick="loadDeleteModal(@eventItem.EventId)">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">No Event</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body" id="eventDetailsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body" id="deleteEventContent">
+                <div class="text-center">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Event Modal -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body" id="editEventContent">
+                <div class="text-center">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Event Modal -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body" id="createEventContent">
+                <div class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function loadEventDetails(eventId) {
+        var modalBody = document.getElementById("eventDetailsContent");
+        modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+            fetch(`/Events/Details/${eventId}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" } // Set AJAX request header
+            })
+            .then(response => response.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<p class="text-danger">Failed to load event details.</p>';
+            });
+    }
+
+    function loadDeleteModal(eventId) {
+        var modalBody = document.getElementById("deleteEventContent");
+        modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        fetch(`/Events/Delete/${eventId}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" } // Set AJAX request header
+            })
+            .then(response => response.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<p class="text-danger">Failed to load delete confirmation.</p>';
+            });
+    }
+
+        function loadEditModal(eventId) {
+        var modalBody = document.getElementById("editEventContent");
+        modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-warning" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        // Close the details modal
+        var detailsModal = bootstrap.Modal.getInstance(document.getElementById("eventDetailsModal"));
+        if (detailsModal) {
+            detailsModal.hide();
+        }
+
+        // Load Edit Form
+        fetch(`/Events/Edit/${eventId}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" } // Set AJAX request header
+            })
+            .then(response => response.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+                new bootstrap.Modal(document.getElementById("editEventModal")).show();
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<p class="text-danger">Failed to load edit form.</p>';
+            });
+    }
+
+        function setMinDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Adjust for timezone
+
+            const eventDateInput = document.getElementById("eventDateInput");
+            eventDateInput.min = now.toISOString().slice(0, 16);
+
+            eventDateInput.addEventListener("input", function () {
+                const selectedDateTime = new Date(eventDateInput.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Set to start of today
+
+                if (selectedDateTime < now) {
+                    alert("Selected date/time cannot be in the past.");
+                    eventDateInput.value = now.toISOString().slice(0, 16);
+                }
+            });
+        }
+
+        function loadCreateModal() {
+        var modalBody = document.getElementById("createEventContent");
+        modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        fetch(`/Events/Create/@clubID`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" } // Set AJAX request header
+            })
+            .then(response => response.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+                new bootstrap.Modal(document.getElementById("createEventModal")).show();
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<p class="text-danger">Failed to load create form.</p>';
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        $('editEventModal').on('shown.bs.modal', function () {
+            setMinDateTime();
+        });
+    });
+
+    function showError() {
+        var errorMessage = "@(ViewBag.Error != null ? ViewBag.Error.Replace("\"", "\\\"") : "")";
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+    }
+
+    showError();
+</script>

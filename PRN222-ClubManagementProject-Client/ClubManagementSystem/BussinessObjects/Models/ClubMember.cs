@@ -40,4 +40,5 @@ public partial class ClubMember
 
     [ForeignKey("UserId")]
     public virtual User User { get; set; } = null!;
+    public ICollection<MembershipFee> MembershipFees { get; set; }
 }

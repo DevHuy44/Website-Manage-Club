@@ -12,6 +12,9 @@ namespace BussinessObjects.Models.Dtos
         public string ClubName { get; set; } = string.Empty;
         public byte[]? Logo { get; set; }
         public byte[]? Cover { get; set; }
+
+        public string? Logo_Url { get; set; }
+        public string? Cover_Url { get; set; }
         public string? Description { get; set; }
     }
 

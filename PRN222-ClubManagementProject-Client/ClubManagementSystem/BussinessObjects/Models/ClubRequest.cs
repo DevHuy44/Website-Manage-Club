@@ -22,6 +22,9 @@ public partial class ClubRequest
     public byte[]? Logo { get; set; }
     public byte[]? Cover { get; set; }
 
+    public string? Logo_Url { get; set; }
+    public string? Cover_Url { get; set; }
+
     [StringLength(50)]
     public string? Status { get; set; }
 

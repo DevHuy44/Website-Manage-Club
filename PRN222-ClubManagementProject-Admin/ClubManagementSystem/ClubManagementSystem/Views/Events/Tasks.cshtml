@@ -1,0 +1,94 @@
+﻿@model BussinessObjects.Models.Event
+@{
+    ViewData["Title"] = "Event Task";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg rounded">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="fw-bold">📅 @Model.EventTitle</h4>
+        </div>
+        <div class="card-body">
+            @if(Model.Status != "Cancelled" && Model.Status != "Finished"){
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-secondary">📌 Assigned Tasks</h5>
+                    <button class="btn btn-success btn-sm" onclick="showCreateModal('@Model.EventId','@Model.CreatedByNavigation.ClubId')">
+                        <i class="bi bi-plus-lg"></i> Create Task
+                    </button>
+                </div>
+            }
+            <hr />
+
+            @if (Model.Tasks != null && Model.Tasks.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var item in Model.Tasks)
+                    {
+                        <li class="list-group-item d-flex align-items-center p-3 shadow-sm">
+                            <a asp-action="Details" asp-controller="ClubTasks" asp-route-id="@item.TaskId" class="text-decoration-none flex-grow-1">
+                                <div>
+                                    <p class="mb-1 fw-bold">@item.TaskDescription</p>
+                                    <small class="text-muted">Due: @(item.DueDate?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")</small>
+                                </div>
+                            </a>
+                            <button class="btn btn-danger btn-sm" onclick="showDeleteModal(@item.TaskId)">
+                                <i class="bi bi-trash3"></i> Delete
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted text-center">No tasks assigned for this event.</p>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="createModalContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="deleteModalContent"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showCreateModal(eventId,ClubId) {
+            $.get('/ClubTasks/Create/'+ClubId+'?eventID=' + eventId, function (data) {
+                $('#createModalContent').html(data);
+                $('#createModal').modal('show');
+            });
+        }
+
+        function showDeleteModal(taskId) {
+            $.get('/ClubTasks/Delete/' + taskId, function (data) {
+                $('#deleteModalContent').html(data);
+                $('#deleteModal').modal('show');
+            });
+        }
+
+        function showError() {
+            var errorMessage = "@(ViewBag.Error != null ? ViewBag.Error.Replace("\"", "\\\"") : "")";
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+        }
+
+        $(document).ready(function () {
+            showError();
+        });
+    </script>
+}

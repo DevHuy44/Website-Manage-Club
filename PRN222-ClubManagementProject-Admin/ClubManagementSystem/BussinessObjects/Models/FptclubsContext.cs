@@ -43,6 +43,8 @@ public partial class FptclubsContext : DbContext
     public virtual DbSet<Comment> Comments { get; set; }
 
     public virtual DbSet<JoinRequest> JoinRequests { get; set; }
+    public virtual DbSet<Fee> Fees { get; set; }
+    public virtual DbSet<MembershipFee> MembershipFees { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -60,7 +62,6 @@ public partial class FptclubsContext : DbContext
             entity.HasKey(e => e.ClubId).HasName("PK__Clubs__BCAD3DD9E76837C6");
 
             entity.Property(e => e.ClubId).HasColumnName("club_id");
-
             entity.Property(e => e.ClubName)
                 .HasMaxLength(100)
                 .IsRequired()
@@ -84,7 +85,6 @@ public partial class FptclubsContext : DbContext
                 .HasColumnName("status");
         });
 
-
         modelBuilder.Entity<ClubMember>(entity =>
         {
             entity.HasKey(e => e.MembershipId).HasName("PK__ClubMemb__CAE49DDD6EBE5379");
@@ -97,23 +97,30 @@ public partial class FptclubsContext : DbContext
                 .HasColumnName("joined_at");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.Club).WithMany(p => p.ClubMembers)
-                .HasForeignKey(d => d.ClubId)
-                .HasConstraintName("FK__ClubMembe__club___4316F928");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.ClubMembers)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__ClubMembe__role___44FF419A");
-
-            entity.HasOne(d => d.User).WithMany(p => p.ClubMembers)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ClubMembe__user___440B1D61");
             entity.Property(e => e.Status)
                 .HasDefaultValue(true)
                 .HasColumnType("bit")
                 .HasColumnName("status");
+
+            entity.HasOne(d => d.Club).WithMany(p => p.ClubMembers)
+                .HasForeignKey(d => d.ClubId)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade để tránh cycles
+                .HasConstraintName("FK__ClubMembe__club___4316F928");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.ClubMembers)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
+                .HasConstraintName("FK__ClubMembe__role___44FF419A");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ClubMembers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
+                .HasConstraintName("FK__ClubMembe__user___440B1D61");
+
+            entity.HasMany(cm => cm.MembershipFees)
+                .WithOne(mf => mf.ClubMember)
+                .HasForeignKey(mf => mf.MemberId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ClubRequest>(entity =>
@@ -136,18 +143,16 @@ public partial class FptclubsContext : DbContext
                 .HasDefaultValue("Pending")
                 .HasColumnName("status");
             entity.Property(e => e.UserId).HasColumnName("user_id");
-
             entity.Property(e => e.Logo)
                 .HasColumnType("varbinary(max)")
-                .HasColumnName("logo"); 
-
+                .HasColumnName("logo");
             entity.Property(e => e.Cover)
                 .HasColumnType("varbinary(max)")
-                .HasColumnName("cover"); 
+                .HasColumnName("cover");
 
             entity.HasOne(d => d.User).WithMany(p => p.ClubRequests)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__ClubReque__user___656C112C");
         });
 
@@ -173,7 +178,7 @@ public partial class FptclubsContext : DbContext
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Events)
                 .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__Events__created___52593CB8");
         });
 
@@ -196,7 +201,7 @@ public partial class FptclubsContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.Notifications)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__Notificat__user___60A75C0F");
         });
 
@@ -223,15 +228,16 @@ public partial class FptclubsContext : DbContext
                 .HasMaxLength(50)
                 .HasDefaultValue("Pending")
                 .HasColumnName("status");
+
             entity.HasOne(d => d.ClubMember)
                 .WithMany(p => p.Posts)
                 .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__Posts__created_b__49C3F6B7");
         });
 
-
-        modelBuilder.Entity<Comment>(entity => {
+        modelBuilder.Entity<Comment>(entity =>
+        {
             entity.HasKey(e => e.CommentId);
 
             entity.Property(e => e.CreatedAt)
@@ -239,21 +245,25 @@ public partial class FptclubsContext : DbContext
                 .HasColumnType("datetime");
 
             entity.HasOne(d => d.Post).WithMany(p => p.Comments)
-                .HasForeignKey(d => d.PostId);
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.Restrict); // Tắt cascade
 
             entity.HasOne(d => d.User).WithMany(p => p.Comments)
-                .HasForeignKey(d => d.UserId);
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Tắt cascade
         });
 
-        modelBuilder.Entity<PostReaction>(entity => {
+        modelBuilder.Entity<PostReaction>(entity =>
+        {
             entity.HasKey(e => e.ReactionId).HasName("PK__Comments");
 
-
             entity.HasOne(d => d.Post).WithMany(p => p.Reactions)
-                .HasForeignKey(d => d.PostId);
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.Restrict); // Tắt cascade
 
             entity.HasOne(d => d.User).WithMany(p => p.Reactions)
-                .HasForeignKey(d => d.UserId);
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Tắt cascade
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -291,7 +301,7 @@ public partial class FptclubsContext : DbContext
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__Tasks__created_b__571DF1D5");
         });
 
@@ -309,11 +319,12 @@ public partial class FptclubsContext : DbContext
 
             entity.HasOne(d => d.Membership).WithMany(p => p.TaskAssignments)
                 .HasForeignKey(d => d.MembershipId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__TaskAssig__membe__5BE2A6F2");
 
             entity.HasOne(d => d.Task).WithMany(p => p.TaskAssignments)
                 .HasForeignKey(d => d.TaskId)
+                .OnDelete(DeleteBehavior.Restrict) // Tắt cascade
                 .HasConstraintName("FK__TaskAssig__task___5AEE82B9");
         });
 
@@ -325,7 +336,6 @@ public partial class FptclubsContext : DbContext
             entity.HasIndex(e => e.Username, "UQ__Users__F3DBC57250E7F37C").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
-
             entity.Property(e => e.Username)
                 .IsRequired()
                 .HasMaxLength(50)
@@ -338,7 +348,7 @@ public partial class FptclubsContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("password");
             entity.Property(e => e.ProfilePicture)
-                .HasColumnType("varbinary(max)") // Store image as binary data
+                .HasColumnType("varbinary(max)")
                 .HasColumnName("profile_picture");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -346,8 +356,62 @@ public partial class FptclubsContext : DbContext
                 .HasColumnName("created_at");
         });
 
+        modelBuilder.Entity<Fee>(entity =>
+        {
+            entity.HasKey(e => e.FeeId);
+
+            entity.Property(e => e.FeeId).HasColumnName("fee_id");
+            entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.FeeDescription).HasColumnName("fee_description");
+            entity.Property(e => e.FeeType).HasColumnName("fee_type");
+            entity.Property(e => e.PaymentMethod).HasColumnName("payment_method");
+            entity.Property(e => e.Amount).HasColumnType("decimal(10,2)").HasColumnName("amount");
+            entity.Property(e => e.DueDate).HasColumnType("datetime").HasColumnName("due_date");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())").HasColumnType("datetime").HasColumnName("created_at");
+
+            entity.HasOne(d => d.Club)
+                .WithMany(p => p.Fees)
+                .HasForeignKey(d => d.ClubId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(d => d.MembershipFees)
+                .WithOne(mf => mf.Fee)
+                .HasForeignKey(mf => mf.FeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MembershipFee>(entity =>
+        {
+            entity.HasKey(e => e.MembershipFeeId);
+
+            entity.Property(e => e.MembershipFeeId).HasColumnName("membership_fee_id");
+            entity.Property(e => e.FeeId).HasColumnName("fee_id");
+            entity.Property(e => e.MemberId).HasColumnName("member_id");
+            entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status").HasDefaultValue("Pending");
+            entity.Property(e => e.PaidAt).HasColumnType("datetime").HasColumnName("paid_at");
+            entity.Property(e => e.TransactionId).HasMaxLength(100).HasColumnName("transaction_id");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())").HasColumnType("datetime").HasColumnName("created_at");
+            entity.Property(e => e.NotificationId).HasColumnName("notification_id");
+
+            entity.HasOne(d => d.Fee)
+                .WithMany(p => p.MembershipFees)
+                .HasForeignKey(d => d.FeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.ClubMember)
+                .WithMany(cm => cm.MembershipFees) // Cần thêm collection MembershipFees trong ClubMember
+                .HasForeignKey(d => d.MemberId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(d => d.Notification)
+                .WithOne(n => n.MembershipFee)
+                .HasForeignKey<MembershipFee>(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         OnModelCreatingPartial(modelBuilder);
     }
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

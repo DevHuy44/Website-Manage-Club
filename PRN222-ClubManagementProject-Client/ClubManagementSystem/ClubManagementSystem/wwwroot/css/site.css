@@ -1,0 +1,90 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.banner-slider {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-slide {
+    position: relative;
+}
+
+    .banner-slide img {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+    }
+
+.banner-caption {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 30px 40px;
+    border-radius: 10px;
+}
+
+    .banner-caption h2 {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .banner-caption p {
+        font-size: 18px;
+    }
+.swiper-pagination {
+    position: relative;
+    bottom: 0;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    opacity: 1;
+    margin: 0 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+
+.swiper-pagination-bullet-active {
+    background: #000; 
+}
+
+.text-truncate-2-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 3em; /* tùy chỉnh theo line-height */
+}
+
+

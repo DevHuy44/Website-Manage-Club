@@ -1,0 +1,151 @@
+﻿@model IEnumerable<BussinessObjects.Models.Dtos.ClubMeberIndexDto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="table-responsive" style="margin-top:20px">
+    <table class="table table-hover table-striped shadow-sm align-middle">
+        <thead class="custom-header text-white text-center">
+            <tr>
+                <th class="py-3">👤 @Html.DisplayNameFor(model => model.Username)</th>
+                <th class="py-3">📅 @Html.DisplayNameFor(model => model.JoinedAt)</th>
+                <th class="py-3">🎭 @Html.DisplayNameFor(model => model.Role)</th>
+                <th class="py-3">⚙️ Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-light">
+            @foreach (var item in Model)
+            {
+                <tr class="text-center">
+                    <td class="d-flex align-items-center ps-3">
+                        <img src="@(string.IsNullOrEmpty(item.ProfilePictureBase64) ? Url.Content("~/defaultPicture.jpg") : item.ProfilePictureBase64)"
+                             alt="User Avatar"
+                             class="rounded-circle me-2 border border-secondary"
+                             style="width: 40px; height: 40px; object-fit: cover;">
+                        <span class="fw-semibold">@item.Username</span>
+                    </td>
+                    <td>@(item.JoinedAt?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                    <td>
+                        <span class="badge
+                            @(item.Role == "Admin" ? "bg-danger" :
+                              item.Role == "Moderator" ? "bg-warning text-dark" :
+                              "bg-info")">
+                            @item.Role
+                        </span>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-primary text-white" data-bs-toggle="modal" data-bs-target="#assignRoleModal" style="border-radius:6px"
+                           onclick="setMembershipId('@item.MembershipId','@item.ClubId')">
+                            Assign Role
+                        </a>
+
+                        <a class="btn btn-sm btn-danger text-white" style="border-radius:6px" data-bs-toggle="modal" data-bs-target="#kickMemberModal" onclick="setMembershipId('@item.MembershipId','@item.ClubId')">
+                            Kick
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Assign Role Modal -->
+<div class="modal fade" id="assignRoleModal" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignRoleModalLabel">Assign Club Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="assignRoleForm" method="post" asp-action="AssignRole">
+                <div class="modal-body">
+                    <input type="hidden" id="membershipIdInput" name="membershipId">
+                    <input type="hidden" id="assignRoleClubIdInput" name="clubId">
+                    <div class="mb-3">
+                        <label for="roleSelect" class="form-label">Select Role</label>
+                        <select id="roleSelect" name="role" class="form-select">
+                            <option value="Admin">Admin</option>
+                            <option value="Moderator">Moderator</option>
+                            <option value="Member">Member</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign Role</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Kick Member Modal -->
+<div class="modal fade" id="kickMemberModal" tabindex="-1" aria-labelledby="kickMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="kickMemberModalLabel">Kick Member</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="kickMemberForm" method="post" asp-action="KickMember" >
+                <div class="modal-body">
+                    <input type="hidden" id="kickMembershipIdInput" name="membershipId">
+                    <input type="hidden" id="kickMembershipClubIdInput" name="clubId">
+                    <p>Are you sure you want to kick this member from the club?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> This action cannot be undone!
+                    </div>
+                    <div class="mb-3">
+                        <label for="kickReason" class="form-label">Reason (optional)</label>
+                        <textarea id="kickReason" name="reason" class="form-control" rows="3" placeholder="Enter reason for kicking this member..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm Kick</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function setMembershipId(membershipId,clubId) {
+        document.getElementById('membershipIdInput').value = membershipId;
+        document.getElementById('kickMembershipIdInput').value = membershipId;
+        document.getElementById('assignRoleClubIdInput').value = clubId;
+        document.getElementById('kickMembershipClubIdInput').value = clubId;
+        document.getElementById('assignRoleForm').value = clubId;
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Popup success and fail -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            Swal.fire({
+                title: "Success!",
+                text: successMessage,
+                icon: "success",
+                confirmButtonText: "OK"
+            });
+        }
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage) {
+            Swal.fire({
+                title: "Error!",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+</script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+
+

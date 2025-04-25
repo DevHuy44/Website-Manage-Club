@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -20,6 +20,7 @@ html {
 body {
   margin-bottom: 60px;
 }
+
 .banner-slider {
     width: 100%;
     position: relative;
@@ -55,3 +56,36 @@ body {
     .banner-caption p {
         font-size: 18px;
     }
+.swiper-pagination {
+    position: relative;
+    bottom: 0;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    opacity: 1;
+    margin: 0 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+
+.swiper-pagination-bullet-active {
+    background: #000; /* chấm active màu đen */
+}
+
+
+.text-truncate-2-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 3em; /* tùy chỉnh theo line-height */
+}
+
+

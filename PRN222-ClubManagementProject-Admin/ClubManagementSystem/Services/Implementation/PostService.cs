@@ -48,7 +48,7 @@ namespace Services.Implementation
         {
             return await _postRepository.GetPostsAsync();
         }
-        public async Task<Post> CreatePostAsync(Post model, IFormFile? imageFile, int userId, int clubId)
+        public async Task<Post> CreatePostAsync(Post model, string image_Url, int userId, int clubId)
         {
             var clubMember = await _clubMemberService.GetClubMemberAsync(clubId, userId);
             if (clubMember == null)
@@ -60,17 +60,11 @@ namespace Services.Implementation
             {
                 CreatedBy = clubMember.MembershipId,
                 Title = model.Title,
+                Image_Url = image_Url,
                 Content = model.Content,
                 Status = "Pending",
                 CreatedAt = DateTime.Now
             };
-
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                using var ms = new MemoryStream();
-                await imageFile.CopyToAsync(ms);
-                post.Image = ms.ToArray();
-            }
 
             return await _postRepository.AddAsync(post);
         }
@@ -92,7 +86,7 @@ namespace Services.Implementation
                 PostId = post.PostId,
                 Title = post.Title,
                 Content = post.Content,
-                ImageBase64 = _imageHelperService.ConvertToBase64(post.Image, "png"),
+                ImageBase64 = post.Image_Url,
                 CreatedAt = post.CreatedAt,
                 Status = post.Status,
 
@@ -150,7 +144,7 @@ namespace Services.Implementation
 
             if (postDto.ImageBase64 != null)
             {
-                post.Image = _imageHelperService.ConvertToByte(postDto.ImageBase64);
+                post.Image_Url = postDto.ImageBase64;
             }
 
             await _postRepository.UpdatePostAsync(post);

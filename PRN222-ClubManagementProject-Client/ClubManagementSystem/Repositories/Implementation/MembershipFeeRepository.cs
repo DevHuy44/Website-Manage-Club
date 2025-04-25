@@ -136,6 +136,16 @@ namespace Repositories.Implementation
                 .Where(mf => mf.Fee.DueDate.Date == dueDate.Date && mf.Status == status)
                 .ToListAsync();
         }
+
+        public async Task<List<MembershipFee>> GetMembershipFeesByOverDateAsync(string status)
+        {
+            return await _context.MembershipFees
+                .Include(mf => mf.Fee)
+                .Include(mf => mf.ClubMember)
+                .ThenInclude(cm => cm.User)
+                .Where(mf => mf.Status == status)
+                .ToListAsync();
+        }
     }
 
 }

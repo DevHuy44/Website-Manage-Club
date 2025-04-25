@@ -47,7 +47,7 @@
 							{
 								var member = Model.ClubMembers[i];
 								<div class="avatar">
-									<img src="@(member.ProfilePictureBase64)" alt="@member.Username">
+									<img src="@(string.IsNullOrEmpty(member.ProfilePictureBase64) ? Url.Content("~/defaultPicture.jpg") : member.ProfilePictureBase64)" alt="@member.Username">
 									<span class="username">@member.Username</span>
 								</div>
 							}
@@ -72,14 +72,14 @@
 				<div class="mb-5">
 					@if (Model.OngoingEvent != null)
 					{
-						<h4 class="mt-4 fw-bold text-primary">Ongoing Event</h4>
+						<h4 class="mt-4 fw-bold text-secondary">Ongoing Event</h4>
 						<div class="card border-primary shadow-lg">
-							<div class="card-header bg-primary text-white d-flex align-items-center">
+							<div class="card-header text-dark d-flex align-items-center" style="background-color: #EED5D2">
 								<i class="fas fa-calendar-alt me-2"></i>
 								<span class="fw-bold">Live Now</span>
 							</div>
 							<div class="card-body">
-								<h4 class="card-title text-primary fw-bold">@Model.OngoingEvent.EventTitle</h4>
+								<h4 class="card-title fw-bold" style="font-size: 1.25rem; color: #BC8F8F" >@Model.OngoingEvent.EventTitle</h4>
 								<h6 class="card-subtitle mb-2 text-muted">
 									<i class="far fa-clock"></i>
 									<span id="eventTime">@Model.OngoingEvent.EventDate.ToString("MMM dd, yyyy hh:mm tt")</span>
@@ -97,7 +97,7 @@
 							{
 								<div class="card event-card rounded border-0 shadow-sm">
 									<div class="card-body text-center">
-										<h6 class="card-title text-primary fw-bold">@item.EventTitle</h6>
+										<h6 class="card-title fw-bold" style="font-size: 1.25rem; color: #BC8F8F">@item.EventTitle</h6>
 										<p class="card-subtitle text-muted small">
 											<i class="far fa-calendar"></i> @item.EventDate.ToString("MMM dd, yyyy hh:mm tt")
 										</p>
