@@ -90,7 +90,7 @@ namespace Services.Implementation
 
             if (!System.IO.File.Exists(filePath))
             {
-                return Array.Empty<byte>(); 
+                return Array.Empty<byte>();
             }
 
             return await System.IO.File.ReadAllBytesAsync(filePath);
